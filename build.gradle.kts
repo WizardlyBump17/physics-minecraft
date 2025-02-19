@@ -37,4 +37,8 @@ tasks {
     test {
         useJUnitPlatform()
     }
+
+    processResources {
+        expand(project.properties)
+    }
 }
