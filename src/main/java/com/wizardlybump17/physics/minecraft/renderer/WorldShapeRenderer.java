@@ -8,6 +8,8 @@ import org.bukkit.World;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.UUID;
+
 public abstract class WorldShapeRenderer<S extends Shape> implements ShapeRenderer<S> {
 
     private final @NotNull World world;
@@ -18,6 +20,11 @@ public abstract class WorldShapeRenderer<S extends Shape> implements ShapeRender
 
     public @NotNull World getWorld() {
         return world;
+    }
+
+    @Override
+    public @NotNull UUID getRendererId() {
+        return world.getUID();
     }
 
     public void drawPoint(@NotNull Vector position, @NotNull Color color, float size) {

@@ -8,12 +8,11 @@ import com.wizardlybump17.physics.three.shape.Shape;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class ShapeRendererTask extends BukkitRunnable {
 
-    private final @NotNull Set<ShapeRenderer<? super Shape>> renderers = new HashSet<>();
+    private final @NotNull Map<UUID, ShapeRenderer<? super Shape>> renderers = new HashMap<>();
     private final @NotNull BaseObjectContainerRegistry registry;
 
     public ShapeRendererTask(@NotNull BaseObjectContainerRegistry registry) {
@@ -21,7 +20,7 @@ public class ShapeRendererTask extends BukkitRunnable {
     }
 
     public void addRenderer(@NotNull ShapeRenderer<? super Shape> renderer) {
-        renderers.add(renderer);
+        renderers.put(renderer.getRendererId(), renderer);
     }
 
     public void clear() {
@@ -31,7 +30,7 @@ public class ShapeRendererTask extends BukkitRunnable {
     @SuppressWarnings("unchecked")
     @Override
     public void run() {
-        for (ShapeRenderer<? super Shape> renderer : renderers) {
+        for (ShapeRenderer<? super Shape> renderer : renderers.values()) {
             if (renderer instanceof WorldShapeRenderer<?> worldShapeRenderer)
                 renderWorldRenderer((WorldShapeRenderer<? super Shape>) worldShapeRenderer);
         }
