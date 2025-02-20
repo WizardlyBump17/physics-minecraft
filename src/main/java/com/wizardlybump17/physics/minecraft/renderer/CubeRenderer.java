@@ -27,4 +27,9 @@ public class CubeRenderer extends WorldShapeRenderer<Cube> {
             }
         }
     }
+
+    @Override
+    public @NotNull Class<Cube> getShapeType() {
+        return Cube.class;
+    }
 }
