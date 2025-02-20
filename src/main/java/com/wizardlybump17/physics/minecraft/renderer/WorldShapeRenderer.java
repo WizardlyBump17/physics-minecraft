@@ -21,10 +21,14 @@ public abstract class WorldShapeRenderer<S extends Shape> implements ShapeRender
     }
 
     public void drawPoint(@NotNull Vector position, @NotNull Color color, float size) {
-        world.spawnParticle(Particle.DUST, position.getX(), position.getY(), position.getZ(), 1, new Particle.DustOptions(color, size));
+        drawPoint(position.getX(), position.getY(), position.getZ(), color, size);
     }
 
     public void drawPoint(@NotNull Vector3D position, @NotNull Color color, float size) {
-        world.spawnParticle(Particle.DUST, position.x(), position.y(), position.z(), 1, new Particle.DustOptions(color, size));
+        drawPoint(position.x(), position.y(), position.z(), color, size);
+    }
+
+    public void drawPoint(double x, double y, double z, @NotNull Color color, float size) {
+        world.spawnParticle(Particle.DUST, x, y, z, 1, new Particle.DustOptions(color, size));
     }
 }
