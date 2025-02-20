@@ -7,8 +7,10 @@ import com.wizardlybump17.physics.three.registry.BaseObjectContainerRegistry;
 import com.wizardlybump17.physics.three.shape.Shape;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.function.Supplier;
 
 public class ShapeRendererTask extends BukkitRunnable {
 
@@ -21,6 +23,26 @@ public class ShapeRendererTask extends BukkitRunnable {
 
     public void addRenderer(@NotNull ShapeRenderer<? super Shape> renderer) {
         renderers.put(renderer.getRendererId(), renderer);
+    }
+
+    public @NotNull Optional<ShapeRenderer<? super Shape>> getRenderer(@NotNull UUID id) {
+        return Optional.ofNullable(renderers.get(id));
+    }
+
+    public @NotNull ShapeRenderer<? super Shape> getRendererOrAdd(@NotNull UUID id, @NotNull Supplier<ShapeRenderer<? super Shape>> supplier) {
+        return renderers.computeIfAbsent(id, $ -> supplier.get());
+    }
+
+    public @NotNull Optional<ShapeRenderer<? super Shape>> removeRenderer(@NotNull UUID id) {
+        return Optional.ofNullable(renderers.remove(id));
+    }
+
+    public boolean hasRenderer(@NotNull UUID id) {
+        return renderers.containsKey(id);
+    }
+
+    public @NotNull Map<UUID, ShapeRenderer<? super Shape>> getRenderers() {
+        return Collections.unmodifiableMap(renderers);
     }
 
     public void clear() {
