@@ -24,6 +24,10 @@ public class ShapeRendererTask extends BukkitRunnable {
         renderers.add(renderer);
     }
 
+    public void clear() {
+        renderers.clear();
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public void run() {
