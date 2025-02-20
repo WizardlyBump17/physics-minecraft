@@ -6,4 +6,6 @@ import org.jetbrains.annotations.NotNull;
 public interface ShapeRenderer<S extends Shape> {
 
     void render(@NotNull S shape);
+
+    @NotNull Class<S> getShapeType();
 }
