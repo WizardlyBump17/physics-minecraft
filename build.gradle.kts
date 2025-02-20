@@ -21,7 +21,7 @@ repositories {
 }
 
 val junit = "5.11.0"
-val physics = "0.1.0-75889fc"
+val physics = "0.1.0-b1a253e"
 val paper = "1.20.6-R0.1-20240702.153951-123"
 
 dependencies {
@@ -29,6 +29,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
 
     implementation("com.wizardlybump17.physics:three:${physics}")
+    implementation("com.wizardlybump17.physics:shared:${physics}")
 
     paperweightDevelopmentBundle("io.papermc.paper:dev-bundle:${paper}")
 }
