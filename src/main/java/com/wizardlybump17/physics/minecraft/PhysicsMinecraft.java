@@ -13,7 +13,7 @@ public class PhysicsMinecraft extends JavaPlugin {
     public void onLoad() {
         startEngine();
 
-        shapeRendererTask = new ShapeRendererTask(Engine.getObjectContainerRegistry());
+        shapeRendererTask = new ShapeRendererTask();
     }
 
     private void startEngine() {
