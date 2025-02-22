@@ -33,6 +33,10 @@ public class ShapeRendererTask extends BukkitRunnable {
         return Collections.unmodifiableMap(renderers);
     }
 
+    public @NotNull Set<ShapeRenderer> getRenderers(@NotNull Class<? extends Shape> type) {
+        return renderers.getOrDefault(type, Set.of());
+    }
+
     public void clear() {
         renderers.clear();
     }
