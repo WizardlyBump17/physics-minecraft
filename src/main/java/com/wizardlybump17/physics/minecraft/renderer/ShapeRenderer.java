@@ -1,15 +1,26 @@
 package com.wizardlybump17.physics.minecraft.renderer;
 
 import com.wizardlybump17.physics.three.shape.Shape;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.UUID;
+import java.util.Collection;
 
-public interface ShapeRenderer<S extends Shape> {
+public interface ShapeRenderer {
 
-    void render(@NotNull S shape);
+    void render(@NotNull Player viewer, @NotNull Shape shape);
 
-    @NotNull Class<S> getShapeType();
+    @NotNull Class<? extends Shape> getShapeType();
 
-    @NotNull UUID getRendererId();
+    default boolean isValidShape(@NotNull Shape shape) {
+        return getShapeType().equals(shape.getClass());
+    }
+
+    @NotNull Collection<Player> getViewers();
+
+    void addViewer(@NotNull Player player);
+
+    boolean hasViewer(@NotNull Player player);
+
+    void removeViewer(@NotNull Player player);
 }

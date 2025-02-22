@@ -1,47 +1,35 @@
 package com.wizardlybump17.physics.minecraft.task;
 
 import com.wizardlybump17.physics.minecraft.renderer.ShapeRenderer;
-import com.wizardlybump17.physics.minecraft.renderer.WorldShapeRenderer;
+import com.wizardlybump17.physics.minecraft.renderer.PlayerShapeRenderer;
+import com.wizardlybump17.physics.three.container.BaseObjectContainer;
 import com.wizardlybump17.physics.three.object.BaseObject;
-import com.wizardlybump17.physics.three.registry.BaseObjectContainerRegistry;
 import com.wizardlybump17.physics.three.shape.Shape;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.function.Supplier;
 
 public class ShapeRendererTask extends BukkitRunnable {
 
-    private final @NotNull Map<UUID, ShapeRenderer<? super Shape>> renderers = new HashMap<>();
-    private final @NotNull BaseObjectContainerRegistry registry;
+    private final @NotNull Map<Class<? extends Shape>, Set<ShapeRenderer>> renderers = new HashMap<>();
 
-    public ShapeRendererTask(@NotNull BaseObjectContainerRegistry registry) {
-        this.registry = registry;
+    public void addRenderer(@NotNull ShapeRenderer renderer) {
+        renderers.computeIfAbsent(renderer.getShapeType(), $ -> new HashSet<>()).add(renderer);
     }
 
-    public void addRenderer(@NotNull ShapeRenderer<? super Shape> renderer) {
-        renderers.put(renderer.getRendererId(), renderer);
+    public void removeRenderer(@NotNull ShapeRenderer renderer) {
+        Set<ShapeRenderer> renderers = this.renderers.get(renderer.getShapeType());
+        if (renderers != null)
+            renderers.remove(renderer);
     }
 
-    public @NotNull Optional<ShapeRenderer<? super Shape>> getRenderer(@NotNull UUID id) {
-        return Optional.ofNullable(renderers.get(id));
+    public boolean hasRenderer(@NotNull ShapeRenderer renderer) {
+        return renderers.getOrDefault(renderer.getShapeType(), Collections.emptySet()).contains(renderer);
     }
 
-    public @NotNull ShapeRenderer<? super Shape> getRendererOrAdd(@NotNull UUID id, @NotNull Supplier<ShapeRenderer<? super Shape>> supplier) {
-        return renderers.computeIfAbsent(id, $ -> supplier.get());
-    }
-
-    public @NotNull Optional<ShapeRenderer<? super Shape>> removeRenderer(@NotNull UUID id) {
-        return Optional.ofNullable(renderers.remove(id));
-    }
-
-    public boolean hasRenderer(@NotNull UUID id) {
-        return renderers.containsKey(id);
-    }
-
-    public @NotNull Map<UUID, ShapeRenderer<? super Shape>> getRenderers() {
+    public @NotNull Map<Class<? extends Shape>, Set<ShapeRenderer>> getRenderers() {
         return Collections.unmodifiableMap(renderers);
     }
 
@@ -49,26 +37,24 @@ public class ShapeRendererTask extends BukkitRunnable {
         renderers.clear();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void run() {
-        for (ShapeRenderer<? super Shape> renderer : renderers.values()) {
-            if (renderer instanceof WorldShapeRenderer<?> worldShapeRenderer)
-                renderWorldRenderer((WorldShapeRenderer<? super Shape>) worldShapeRenderer);
+        for (Set<ShapeRenderer> renderers : renderers.values()) {
+            for (ShapeRenderer renderer : renderers) {
+                if (renderer instanceof PlayerShapeRenderer worldShapeRenderer)
+                    renderWorldRenderer(worldShapeRenderer);
+            }
         }
     }
 
-    protected void renderWorldRenderer(@NotNull WorldShapeRenderer<? super Shape> renderer) {
-        Class<? extends Shape> shapeType = renderer.getShapeType();
-        registry.get(renderer.getWorld().getUID()).ifPresent(container -> {
+    protected void renderWorldRenderer(@NotNull PlayerShapeRenderer renderer) {
+        for (Player viewer : renderer.getViewers()) {
+            BaseObjectContainer container = renderer.getContainer();
             for (BaseObject object : container.getLoadedObjects()) {
-                if (object.getClass().equals(shapeType))
-                    renderer.render(shapeType.cast(object));
+                Shape shape = object.getShape();
+                if (renderer.isValidShape(shape))
+                    renderer.render(viewer, shape);
             }
-        });
-    }
-
-    public @NotNull BaseObjectContainerRegistry getRegistry() {
-        return registry;
+        }
     }
 }
