@@ -22,7 +22,7 @@ repositories {
 }
 
 val junit = "5.11.0"
-val physics = "0.1.0-b1a253e"
+val physics = "0.1.0-c138a5d"
 val paper = "1.20.6-R0.1-20240702.153951-123"
 
 dependencies {
