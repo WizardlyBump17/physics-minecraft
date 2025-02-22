@@ -10,6 +10,8 @@ val gitVersion: groovy.lang.Closure<String> by extra
 group = "com.wizardlybump17.physics"
 version = "${properties["version"]}-${gitVersion()}"
 
+println("Running $name $version")
+
 repositories {
     mavenCentral()
     maven {
