@@ -3,3 +3,6 @@ version: ${project.version}
 main: com.wizardlybump17.physics.minecraft.PhysicsMinecraft
 author: WizardlyBump17
 api-version: 1.20
+commands:
+  physics:
+    permission: physics.admin
