@@ -3,6 +3,7 @@ plugins {
     id("com.palantir.git-version") version "3.1.0"
     id("io.papermc.paperweight.userdev") version "1.7.1"
     id("com.gradleup.shadow") version "8.3.6"
+    id("maven-publish")
 }
 
 val gitVersion: groovy.lang.Closure<String> by extra
@@ -48,5 +49,30 @@ tasks {
 
     assemble {
         dependsOn(shadowJar)
+    }
+
+    java {
+        withSourcesJar()
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            url = uri("https://maven.pkg.github.com/WizardlyBump17/physics-minecraft")
+            credentials {
+                username = project.findProperty("gpr.user") as String? ?: System.getenv("USERNAME")
+                password = project.findProperty("gpr.key") as String? ?: System.getenv("TOKEN")
+            }
+        }
+    }
+
+    publications {
+        create<MavenPublication>("github-packages") {
+            from(components["java"])
+            artifacts {
+                tasks.named("reobfJar")
+            }
+        }
     }
 }
