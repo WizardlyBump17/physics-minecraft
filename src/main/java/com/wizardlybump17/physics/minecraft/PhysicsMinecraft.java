@@ -78,5 +78,7 @@ public class PhysicsMinecraft extends JavaPlugin {
         Thread thread = Engine.getThread();
         if (thread != null)
             thread.interrupt();
+        if (thread instanceof EngineThread engineThread)
+            engineThread.setRunning(false);
     }
 }
