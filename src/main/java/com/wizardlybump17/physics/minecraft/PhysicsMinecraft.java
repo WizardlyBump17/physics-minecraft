@@ -29,14 +29,12 @@ public class PhysicsMinecraft extends JavaPlugin {
 
     private void startEngine() {
         BaseObjectContainerRegistry containerRegistry = new BaseObjectContainerRegistry();
-        Engine.setObjectContainerRegistry(containerRegistry);
-        containerRegistry.register(new MapBaseObjectContainer(Bukkit.getWorld("world").getUID()));
-
         TaskScheduler scheduler = new TaskScheduler(new RegisteredTaskFactory());
-        Engine.setScheduler(scheduler);
-
         EngineThread thread = new EngineThread(scheduler, containerRegistry);
-        Engine.setThread(thread);
+
+        Engine.start(containerRegistry, thread, scheduler);
+
+        containerRegistry.register(new MapBaseObjectContainer(Bukkit.getWorld("world").getUID()));
         thread.start();
     }
 
@@ -71,14 +69,6 @@ public class PhysicsMinecraft extends JavaPlugin {
         if (shapeRendererTask != null)
             shapeRendererTask.clear();
 
-        shutdownEngine();
-    }
-
-    private void shutdownEngine() {
-        Thread thread = Engine.getThread();
-        if (thread != null)
-            thread.interrupt();
-        if (thread instanceof EngineThread engineThread)
-            engineThread.setRunning(false);
+        Engine.shutdown();
     }
 }
