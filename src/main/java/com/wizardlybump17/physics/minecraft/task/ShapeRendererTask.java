@@ -33,6 +33,17 @@ public class ShapeRendererTask extends BukkitRunnable {
         return Collections.unmodifiableMap(renderers);
     }
 
+    public @NotNull Map<Class<? extends Shape>, Set<ShapeRenderer>> getRenderers(@NotNull UUID containerId) {
+        Map<Class<? extends Shape>, Set<ShapeRenderer>> renderers = new HashMap<>();
+        this.renderers.forEach((type, renderersSet) -> {
+            for (ShapeRenderer renderer : renderersSet) {
+                if (renderer instanceof PlayerShapeRenderer playerShapeRenderer && playerShapeRenderer.getContainer().getId().equals(containerId))
+                    renderers.computeIfAbsent(type, $ -> new HashSet<>()).add(renderer);
+            }
+        });
+        return renderers;
+    }
+
     public @NotNull Set<ShapeRenderer> getRenderers(@NotNull Class<? extends Shape> type) {
         return renderers.getOrDefault(type, Set.of());
     }

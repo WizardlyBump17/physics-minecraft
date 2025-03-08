@@ -2,14 +2,13 @@ package com.wizardlybump17.physics.minecraft.command;
 
 import com.wizardlybump17.physics.minecraft.Converter;
 import com.wizardlybump17.physics.minecraft.debug.DebugObjectContainer;
+import com.wizardlybump17.physics.minecraft.debug.object.DebugObject;
 import com.wizardlybump17.physics.minecraft.renderer.CubeRenderer;
 import com.wizardlybump17.physics.minecraft.renderer.ShapeRenderer;
 import com.wizardlybump17.physics.minecraft.renderer.SphereRenderer;
 import com.wizardlybump17.physics.minecraft.task.ShapeRendererTask;
 import com.wizardlybump17.physics.three.Engine;
-import com.wizardlybump17.physics.three.container.BaseObjectContainer;
 import com.wizardlybump17.physics.three.object.BaseObject;
-import com.wizardlybump17.physics.three.object.BasicObject;
 import com.wizardlybump17.physics.three.registry.BaseObjectContainerRegistry;
 import com.wizardlybump17.physics.three.shape.Cube;
 import com.wizardlybump17.physics.three.shape.Sphere;
@@ -26,12 +25,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.BooleanSupplier;
 
 public class PhysicsCommand implements CommandExecutor, TabCompleter {
 
     private final @NotNull ShapeRendererTask shapeRendererTask;
-    private boolean paused;
 
     public PhysicsCommand(@NotNull ShapeRendererTask shapeRendererTask) {
         this.shapeRendererTask = shapeRendererTask;
@@ -49,44 +46,46 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
         BaseObjectContainerRegistry containerRegistry = Engine.getObjectContainerRegistry();
         World world = player.getWorld();
 
+        DebugObjectContainer container = (DebugObjectContainer) containerRegistry.get(DebugObjectContainer.getId(world))
+                .orElseGet(() -> {
+                    DebugObjectContainer newContainer = new DebugObjectContainer(world);
+                    containerRegistry.register(newContainer);
+
+                    shapeRendererTask.addRenderer(new CubeRenderer(newContainer));
+                    shapeRendererTask.addRenderer(new SphereRenderer(newContainer));
+                    return newContainer;
+                });
+
         switch (args[0].toLowerCase()) {
             case "debug" -> {
-                if (args.length == 1) {
-                    BaseObjectContainer container = containerRegistry.get(DebugObjectContainer.getId(world))
-                            .orElseGet(() -> {
-                                DebugObjectContainer newContainer = new DebugObjectContainer(world);
-                                containerRegistry.register(newContainer);
-
-                                shapeRendererTask.addRenderer(new CubeRenderer(newContainer));
-                                shapeRendererTask.addRenderer(new SphereRenderer(newContainer));
-                                return newContainer;
-                            });
-                    UUID containerId = container.getId();
-
-                    shapeRendererTask.getRenderers(Cube.class, containerId).stream().findFirst().ifPresent(renderer -> {
-                        BaseObject object = getDebugCube(player, container, () -> paused);
-                        container.addObject(object);
-
-                        renderer.addViewer(player);
-                    });
-                    shapeRendererTask.getRenderers(Sphere.class, containerId).stream().findFirst().ifPresent(renderer -> {
-                        BaseObject object = getDebugSphere(player, container, () -> paused);
-                        container.addObject(object);
-
-                        renderer.addViewer(player);
-                    });
+                if (args.length == 1)
                     return false;
-                }
 
-                if (args.length == 2) {
-                    switch (args[1].toLowerCase()) {
-                        case "stop" -> {
-                            for (Set<ShapeRenderer> renderers : shapeRendererTask.getRenderers().values())
-                                for (ShapeRenderer renderer : renderers)
-                                    renderer.removeViewer(player);
+                switch (args[1].toLowerCase()) {
+                    case "clear" -> {
+                        for (Set<ShapeRenderer> renderers : shapeRendererTask.getRenderers(container.getId()).values()) {
+                            for (ShapeRenderer renderer : renderers) {
+                                renderer.removeViewer(player);
+                                for (BaseObject object : container.getLoadedObjects())
+                                    container.removeObject(object.getId());
+                            }
                         }
-                        case "pause" -> paused = !paused;
                     }
+                    case "follow" -> {
+                        if (args.length == 2)
+                            return false;
+
+                        switch (args[2].toLowerCase()) {
+                            case "start" -> spawnDebugObjects(player, container, true);
+                            case "toggle" -> {
+                                for (BaseObject object : container.getLoadedObjects()) {
+                                    if (object instanceof DebugObject debugObject)
+                                        debugObject.setFollowing(!debugObject.isFollowing());
+                                }
+                            }
+                        }
+                    }
+                    case "static" -> spawnDebugObjects(player, container, false);
                 }
             }
         }
@@ -98,36 +97,30 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
         return List.of();
     }
 
-    public static @NotNull BaseObject getDebugCube(@NotNull Player player, @NotNull BaseObjectContainer container, @NotNull BooleanSupplier pausedSupplier) {
+    public static @NotNull DebugObject getDebugCube(@NotNull Player player, @NotNull DebugObjectContainer container, boolean follow) {
         Location location = player.getLocation();
-        World world = player.getWorld();
-        return new BasicObject(new Cube(Converter.convert(location.toVector()), Converter.convert(location.toVector()).add(1, 1, 1)), container) {
-            @Override
-            public void tick() {
-                tickDebugObject(this, player, world, pausedSupplier);
-            }
-        };
+        return new DebugObject(new Cube(Converter.convert(location.toVector()), Converter.convert(location.toVector()).add(1, 1, 1)), container, player, follow);
     }
 
-    public static @NotNull BaseObject getDebugSphere(@NotNull Player player, @NotNull BaseObjectContainer container, @NotNull BooleanSupplier pausedSupplier) {
+    public static @NotNull DebugObject getDebugSphere(@NotNull Player player, @NotNull DebugObjectContainer container, boolean follow) {
         Location location = player.getLocation();
-        World world = player.getWorld();
-        return new BasicObject(new Sphere(Converter.convert(location.toVector()), 0.5), container) {
-            @Override
-            public void tick() {
-                tickDebugObject(this, player, world, pausedSupplier);
-            }
-        };
+        return new DebugObject(new Sphere(Converter.convert(location.toVector()), 0.5), container, player, follow);
     }
 
-    public static void tickDebugObject(@NotNull BaseObject object, @NotNull Player player, @NotNull World originalWorld, @NotNull BooleanSupplier pausedSupplier) {
-        if (pausedSupplier.getAsBoolean())
-            return;
+    public void spawnDebugObjects(@NotNull Player player, @NotNull DebugObjectContainer container, boolean follow) {
+        UUID containerId = container.getId();
 
-        Location currentLocation = player.getEyeLocation();
-        if (!currentLocation.getWorld().equals(originalWorld))
-            return;
+        shapeRendererTask.getRenderers(Cube.class, containerId).stream().findFirst().ifPresent(renderer -> {
+            DebugObject object = getDebugCube(player, container, follow);
+            container.addObject(object);
 
-        object.teleport(Converter.convert(currentLocation.add(currentLocation.getDirection().multiply(3)).toVector()));
+            renderer.addViewer(player);
+        });
+        shapeRendererTask.getRenderers(Sphere.class, containerId).stream().findFirst().ifPresent(renderer -> {
+            DebugObject object = getDebugSphere(player, container, follow);
+            container.addObject(object);
+
+            renderer.addViewer(player);
+        });
     }
 }
