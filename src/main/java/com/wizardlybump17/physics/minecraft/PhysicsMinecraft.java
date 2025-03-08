@@ -15,6 +15,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
 
 public class PhysicsMinecraft extends JavaPlugin {
 
@@ -70,5 +71,9 @@ public class PhysicsMinecraft extends JavaPlugin {
             shapeRendererTask.clear();
 
         Engine.shutdown();
+    }
+
+    public static @NotNull PhysicsMinecraft getInstance() {
+        return getPlugin(PhysicsMinecraft.class);
     }
 }

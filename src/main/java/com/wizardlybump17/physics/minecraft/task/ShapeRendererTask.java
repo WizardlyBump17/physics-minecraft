@@ -1,7 +1,7 @@
 package com.wizardlybump17.physics.minecraft.task;
 
-import com.wizardlybump17.physics.minecraft.renderer.ShapeRenderer;
 import com.wizardlybump17.physics.minecraft.renderer.PlayerShapeRenderer;
+import com.wizardlybump17.physics.minecraft.renderer.ShapeRenderer;
 import com.wizardlybump17.physics.three.container.BaseObjectContainer;
 import com.wizardlybump17.physics.three.object.BaseObject;
 import com.wizardlybump17.physics.three.shape.Shape;
@@ -35,6 +35,14 @@ public class ShapeRendererTask extends BukkitRunnable {
 
     public @NotNull Set<ShapeRenderer> getRenderers(@NotNull Class<? extends Shape> type) {
         return renderers.getOrDefault(type, Set.of());
+    }
+
+    public @NotNull Set<ShapeRenderer> getRenderers(@NotNull Class<? extends Shape> type, @NotNull UUID containerId) {
+        Set<ShapeRenderer> renderers = new HashSet<>();
+        for (ShapeRenderer renderer : this.renderers.getOrDefault(type, Set.of()))
+            if (renderer instanceof PlayerShapeRenderer playerShapeRenderer && playerShapeRenderer.getContainer().getId().equals(containerId))
+                renderers.add(renderer);
+        return renderers;
     }
 
     public void clear() {
