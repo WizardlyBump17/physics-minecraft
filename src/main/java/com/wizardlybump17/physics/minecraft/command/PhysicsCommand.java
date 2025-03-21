@@ -7,7 +7,9 @@ import com.wizardlybump17.physics.minecraft.renderer.object.BasicObjectRenderer;
 import com.wizardlybump17.physics.minecraft.renderer.object.ObjectRenderer;
 import com.wizardlybump17.physics.minecraft.task.ShapeRendererTask;
 import com.wizardlybump17.physics.three.Engine;
+import com.wizardlybump17.physics.three.Vector3D;
 import com.wizardlybump17.physics.three.object.BaseObject;
+import com.wizardlybump17.physics.three.object.PhysicsObject;
 import com.wizardlybump17.physics.three.registry.BaseObjectContainerRegistry;
 import com.wizardlybump17.physics.three.shape.Cube;
 import com.wizardlybump17.physics.three.shape.Sphere;
@@ -74,7 +76,10 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
                             return false;
 
                         switch (args[2].toLowerCase()) {
-                            case "start" -> spawnDebugObjects(player, container, true);
+                            case "start" -> {
+                                String type = args.length == 4 ? args[3] : "cube";
+                                spawnDebugObjects(player, container, true, type);
+                            }
                             case "toggle" -> {
                                 for (BaseObject object : container.getLoadedObjects()) {
                                     if (object instanceof DebugObject debugObject)
@@ -83,7 +88,24 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
                             }
                         }
                     }
-                    case "static" -> spawnDebugObjects(player, container, false);
+                    case "static" -> {
+                        String type = args.length == 3 ? args[2] : "cube";
+                        spawnDebugObjects(player, container, false, type);
+                    }
+                    case "physics" -> {
+                        container.addObject(new PhysicsObject(
+                                new Sphere(
+                                        Converter.convert(player.getEyeLocation().toVector()),
+                                        1
+                                ),
+                                container,
+                                new Vector3D(0, -9.8, 0),
+                                Vector3D.ZERO
+                        ));
+                        shapeRendererTask.getRenderers(BaseObject.class, container.getId()).stream().findFirst().ifPresent(renderer -> {
+                            renderer.addViewer(player);
+                        });
+                    }
                 }
             }
         }
@@ -97,23 +119,40 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
 
     public static @NotNull DebugObject getDebugCube(@NotNull Player player, @NotNull DebugObjectContainer container, boolean follow) {
         Location location = player.getLocation();
-        return new DebugObject(new Cube(Converter.convert(location.toVector()), Converter.convert(location.toVector()).add(1, 1, 1)), container, player, follow);
+        return new DebugObject(
+                new Cube(
+                        Converter.convert(location.toVector()),
+                        follow ? Converter.convert(location.toVector()).add(0.3, 0.3, 0.3) : Converter.convert(location.toVector()).add(1, 1, 1)
+                ),
+                container,
+                player,
+                follow);
     }
 
     public static @NotNull DebugObject getDebugSphere(@NotNull Player player, @NotNull DebugObjectContainer container, boolean follow) {
         Location location = player.getLocation();
-        return new DebugObject(new Sphere(Converter.convert(location.toVector()), 0.5), container, player, follow);
+        return new DebugObject(
+                new Sphere(
+                        Converter.convert(location.toVector()),
+                        0.5
+                ),
+                container,
+                player,
+                follow
+        );
     }
 
-    public void spawnDebugObjects(@NotNull Player player, @NotNull DebugObjectContainer container, boolean follow) {
+    public void spawnDebugObjects(@NotNull Player player, @NotNull DebugObjectContainer container, boolean follow, @NotNull String type) {
         UUID containerId = container.getId();
 
         shapeRendererTask.getRenderers(BaseObject.class, containerId).stream().findFirst().ifPresent(renderer -> {
-            DebugObject debugCube = getDebugCube(player, container, follow);
-            DebugObject debugSphere = getDebugSphere(player, container, follow);
+            BaseObject object = switch (type.toLowerCase()) {
+                case "cube" -> getDebugCube(player, container, follow);
+                case "sphere" -> getDebugSphere(player, container, follow);
+                default -> throw new IllegalArgumentException("Invalid type: " + type);
+            };
 
-            container.addObject(debugCube);
-            container.addObject(debugSphere);
+            container.addObject(object);
 
             renderer.addViewer(player);
         });
