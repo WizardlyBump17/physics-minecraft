@@ -22,10 +22,11 @@ repositories {
             password = project.findProperty("gpr.key") as String? ?: System.getenv("TOKEN")
         }
     }
+    mavenLocal()
 }
 
 val junit = "5.11.0"
-val physics = "0.1.0-3abc9b9"
+val physics = "0.1.0-45bf465.dirty"
 val paper = "1.20.6-R0.1-20240702.153951-123"
 
 dependencies {

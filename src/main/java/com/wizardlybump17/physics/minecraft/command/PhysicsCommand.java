@@ -3,9 +3,8 @@ package com.wizardlybump17.physics.minecraft.command;
 import com.wizardlybump17.physics.minecraft.Converter;
 import com.wizardlybump17.physics.minecraft.debug.DebugObjectContainer;
 import com.wizardlybump17.physics.minecraft.debug.object.DebugObject;
-import com.wizardlybump17.physics.minecraft.renderer.CubeRenderer;
-import com.wizardlybump17.physics.minecraft.renderer.ShapeRenderer;
-import com.wizardlybump17.physics.minecraft.renderer.SphereRenderer;
+import com.wizardlybump17.physics.minecraft.renderer.object.BasicObjectRenderer;
+import com.wizardlybump17.physics.minecraft.renderer.object.ObjectRenderer;
 import com.wizardlybump17.physics.minecraft.task.ShapeRendererTask;
 import com.wizardlybump17.physics.three.Engine;
 import com.wizardlybump17.physics.three.object.BaseObject;
@@ -51,8 +50,7 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
                     DebugObjectContainer newContainer = new DebugObjectContainer(world);
                     containerRegistry.register(newContainer);
 
-                    shapeRendererTask.addRenderer(new CubeRenderer(newContainer));
-                    shapeRendererTask.addRenderer(new SphereRenderer(newContainer));
+                    shapeRendererTask.addRenderer(new BasicObjectRenderer(newContainer));
                     return newContainer;
                 });
 
@@ -63,8 +61,8 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
 
                 switch (args[1].toLowerCase()) {
                     case "clear" -> {
-                        for (Set<ShapeRenderer> renderers : shapeRendererTask.getRenderers(container.getId()).values()) {
-                            for (ShapeRenderer renderer : renderers) {
+                        for (Set<ObjectRenderer> renderers : shapeRendererTask.getRenderers(container.getId()).values()) {
+                            for (ObjectRenderer renderer : renderers) {
                                 renderer.removeViewer(player);
                                 for (BaseObject object : container.getLoadedObjects())
                                     container.removeObject(object.getId());
@@ -110,15 +108,12 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
     public void spawnDebugObjects(@NotNull Player player, @NotNull DebugObjectContainer container, boolean follow) {
         UUID containerId = container.getId();
 
-        shapeRendererTask.getRenderers(Cube.class, containerId).stream().findFirst().ifPresent(renderer -> {
-            DebugObject object = getDebugCube(player, container, follow);
-            container.addObject(object);
+        shapeRendererTask.getRenderers(BaseObject.class, containerId).stream().findFirst().ifPresent(renderer -> {
+            DebugObject debugCube = getDebugCube(player, container, follow);
+            DebugObject debugSphere = getDebugSphere(player, container, follow);
 
-            renderer.addViewer(player);
-        });
-        shapeRendererTask.getRenderers(Sphere.class, containerId).stream().findFirst().ifPresent(renderer -> {
-            DebugObject object = getDebugSphere(player, container, follow);
-            container.addObject(object);
+            container.addObject(debugCube);
+            container.addObject(debugSphere);
 
             renderer.addViewer(player);
         });

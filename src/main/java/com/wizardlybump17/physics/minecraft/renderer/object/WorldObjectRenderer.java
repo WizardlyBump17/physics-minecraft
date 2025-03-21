@@ -1,23 +1,24 @@
-package com.wizardlybump17.physics.minecraft.renderer;
+package com.wizardlybump17.physics.minecraft.renderer.object;
 
 import com.wizardlybump17.physics.three.Vector3D;
 import com.wizardlybump17.physics.three.container.BaseObjectContainer;
-import com.wizardlybump17.physics.three.registry.BaseObjectContainerRegistry;
 import org.bukkit.Color;
 import org.bukkit.Particle;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
-public abstract class PlayerShapeRenderer implements ShapeRenderer {
+public abstract class WorldObjectRenderer implements ObjectRenderer {
 
     private final @NotNull Set<Player> viewers = new HashSet<>();
     private final @NotNull BaseObjectContainer container;
 
-    public PlayerShapeRenderer(@NotNull BaseObjectContainer container) {
+    public WorldObjectRenderer(@NotNull BaseObjectContainer container) {
         this.container = container;
     }
 
