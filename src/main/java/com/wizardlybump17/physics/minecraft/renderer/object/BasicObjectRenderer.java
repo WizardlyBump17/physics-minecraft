@@ -42,7 +42,7 @@ public class BasicObjectRenderer extends WorldObjectRenderer {
                 }
             }
             case Sphere sphere -> {
-                Color color = hasCollisions ? SPHERE_COLOR : SPHERE_COLLIDING_COLOR;
+                Color color = hasCollisions ? SPHERE_COLLIDING_COLOR : SPHERE_COLOR;
 
                 double radius = sphere.getRadius();
                 Vector3D position = sphere.getPosition();
