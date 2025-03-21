@@ -16,7 +16,7 @@ public class BasicObjectRenderer extends WorldObjectRenderer {
     public static final @NotNull Color CUBE_COLLIDING_COLOR = Color.BLUE;
     public static final @NotNull Color SPHERE_COLOR = Color.PURPLE;
     public static final @NotNull Color SPHERE_COLLIDING_COLOR = Color.RED;
-    public static final float SIZE = 0.1F;
+    public static final float SIZE = 0.2F;
 
     public BasicObjectRenderer(@NotNull BaseObjectContainer container) {
         super(container);
