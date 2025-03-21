@@ -13,7 +13,9 @@ import org.jetbrains.annotations.NotNull;
 public class BasicObjectRenderer extends WorldObjectRenderer {
 
     public static final @NotNull Color CUBE_COLOR = Color.AQUA;
+    public static final @NotNull Color CUBE_COLLIDING_COLOR = Color.BLUE;
     public static final @NotNull Color SPHERE_COLOR = Color.PURPLE;
+    public static final @NotNull Color SPHERE_COLLIDING_COLOR = Color.RED;
     public static final float SIZE = 0.1F;
 
     public BasicObjectRenderer(@NotNull BaseObjectContainer container) {
@@ -23,20 +25,25 @@ public class BasicObjectRenderer extends WorldObjectRenderer {
     @Override
     public void render(@NotNull Player viewer, @NotNull BaseObject object) {
         Shape shape = object.getShape();
+        boolean hasCollisions = !object.getCollidingWith().isEmpty();
 
         switch (shape) {
             case Cube cube -> {
+                Color color = hasCollisions ? CUBE_COLLIDING_COLOR : CUBE_COLOR;
+
                 Vector3D min = cube.getMin();
                 Vector3D max = cube.getMax();
                 for (double x = min.x(); x <= max.x(); x += 0.1) {
                     for (double y = min.y(); y <= max.y(); y += 0.1) {
                         for (double z = min.z(); z <= max.z(); z += 0.1) {
-                            drawPoint(viewer, x, y, z, CUBE_COLOR, SIZE);
+                            drawPoint(viewer, x, y, z, color, SIZE);
                         }
                     }
                 }
             }
             case Sphere sphere -> {
+                Color color = hasCollisions ? SPHERE_COLOR : SPHERE_COLLIDING_COLOR;
+
                 double radius = sphere.getRadius();
                 Vector3D position = sphere.getPosition();
                 Vector3D min = position.subtract(radius, radius, radius);
@@ -45,7 +52,7 @@ public class BasicObjectRenderer extends WorldObjectRenderer {
                     for (double y = min.y(); y <= max.y(); y += 0.1) {
                         for (double z = min.z(); z <= max.z(); z += 0.1) {
                             if (sphere.hasPoint(new Vector3D(x, y, z)))
-                                drawPoint(viewer, x, y, z, SPHERE_COLOR, SIZE);
+                                drawPoint(viewer, x, y, z, color, SIZE);
                         }
                     }
                 }
