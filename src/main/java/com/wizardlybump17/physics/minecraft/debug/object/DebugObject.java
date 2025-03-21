@@ -27,6 +27,8 @@ public class DebugObject extends BasicObject {
 
     @Override
     public void tick() {
+        super.tick();
+
         if (!canFollow || !following)
             return;
 
