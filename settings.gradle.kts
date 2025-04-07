@@ -6,3 +6,5 @@ pluginManagement {
 }
 
 rootProject.name = "physics-minecraft"
+
+includeBuild("libs/physics")

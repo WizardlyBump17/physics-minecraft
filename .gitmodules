@@ -1,0 +1,3 @@
+[submodule "libs/physics"]
+	path = libs/physics
+	url = https://github.com/WizardlyBump17/physics

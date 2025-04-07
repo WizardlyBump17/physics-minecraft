@@ -26,15 +26,14 @@ repositories {
 }
 
 val junit = "5.11.0"
-val physics = "0.1.0-5da388a"
 val paper = "1.20.6-R0.1-20240702.153951-123"
 
 dependencies {
     testImplementation(platform("org.junit:junit-bom:${junit}"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 
-    implementation("com.wizardlybump17.physics:three:${physics}")
-    implementation("com.wizardlybump17.physics:shared:${physics}")
+    implementation("com.wizardlybump17.physics:three")
+    implementation("com.wizardlybump17.physics:shared")
 
     paperweightDevelopmentBundle("io.papermc.paper:dev-bundle:${paper}")
 }
@@ -54,6 +53,12 @@ tasks {
 
     java {
         withSourcesJar()
+    }
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
     }
 }
 
