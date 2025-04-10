@@ -22,7 +22,6 @@ repositories {
             password = project.findProperty("gpr.key") as String? ?: System.getenv("TOKEN")
         }
     }
-    mavenLocal()
 }
 
 val junit = "5.11.0"
