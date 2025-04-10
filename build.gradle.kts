@@ -1,15 +1,12 @@
 plugins {
     id("java")
-    id("com.palantir.git-version") version "3.1.0"
     id("io.papermc.paperweight.userdev") version "1.7.1"
     id("com.gradleup.shadow") version "8.3.6"
     id("maven-publish")
 }
 
-val gitVersion: groovy.lang.Closure<String> by extra
-
 group = "com.wizardlybump17.physics"
-version = "${properties["version"]}-${gitVersion()}"
+version = "0.1.0"
 
 println("Running $name $version")
 
