@@ -13,6 +13,7 @@ import com.wizardlybump17.physics.three.object.PhysicsObject;
 import com.wizardlybump17.physics.three.registry.BaseObjectContainerRegistry;
 import com.wizardlybump17.physics.three.shape.Cube;
 import com.wizardlybump17.physics.three.shape.Sphere;
+import com.wizardlybump17.physics.three.shape.rotating.RotatingCube;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.Command;
@@ -23,9 +24,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class PhysicsCommand implements CommandExecutor, TabCompleter {
 
@@ -142,6 +142,86 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
         );
     }
 
+    public static @NotNull DebugObject getDebugRotatingCube(@NotNull Player player, @NotNull DebugObjectContainer container, boolean follow) {
+        Location location = player.getLocation();
+        return new DebugObject(
+                new RotatingCube(
+                        Converter.convert(location.toVector()),
+                        sortPolygonPoints(List.of(
+                                new Vector3D(-2, 1, -1),
+                                new Vector3D(-2, 1, 1),
+                                new Vector3D(2, 1, -1),
+                                new Vector3D(2, 1, 1),
+                                new Vector3D(-2, -1, -1),
+                                new Vector3D(-2, -1, 1),
+                                new Vector3D(2, -1, -1),
+                                new Vector3D(2, -1, 1),
+                                new Vector3D(2, -3, 1)
+                        ), false),
+                        Vector3D.ZERO
+                ),
+                container,
+                player,
+                follow
+        );
+    }
+
+    public static List<Vector3D> sortPolygonPoints(List<Vector3D> points, boolean reversed) {
+        // Step 1: Centroid
+        Vector3D centroid = points.stream()
+                .reduce(new Vector3D(0, 0, 0), Vector3D::add)
+                .multiply(1.0 / points.size());
+
+        // Step 2: Normal (use cross product of two edges)
+        Vector3D edge1 = points.get(1).subtract(points.get(0));
+        Vector3D edge2 = points.get(2).subtract(points.get(0));
+        Vector3D normal = crossProduct(edge1, edge2).normalize();
+
+        // Step 3: Basis vectors (u, v) on the plane
+        Vector3D u = edge1.normalize();
+        Vector3D v = crossProduct(normal, u); // perpendicular to both u and normal
+
+        // Step 4: Compute angles from centroid
+        List<PointWithAngle> angles = new ArrayList<>();
+        for (Vector3D p : points) {
+            Vector3D rel = p.subtract(centroid);
+            double x = dotProduct(rel, u);
+            double y = dotProduct(rel, v);
+            double angle = Math.atan2(y, x);
+            angles.add(new PointWithAngle(p, angle));
+        }
+
+        // Step 5: Sort by angle
+        angles.sort(reversed
+                ? Comparator.comparingDouble(a -> ((PointWithAngle) a).angle).reversed()
+                : Comparator.comparingDouble(a -> a.angle)
+        );
+
+        return angles.stream().map(pa -> pa.point).collect(Collectors.toList());
+    }
+
+    public static double dotProduct(@NotNull Vector3D a, @NotNull Vector3D b) {
+        return a.x() * b.x() + a.y() * b.y() + a.z() * b.z();
+    }
+
+    public static @NotNull Vector3D crossProduct(@NotNull Vector3D a, @NotNull Vector3D b) {
+        return new Vector3D(
+                a.y() * b.z() - a.z() * b.y(),
+                a.z() * b.x() - a.x() * b.z(),
+                a.x() * b.y() - a.y() * b.x()
+        );
+    }
+
+    private static class PointWithAngle {
+        Vector3D point;
+        double angle;
+
+        PointWithAngle(Vector3D point, double angle) {
+            this.point = point;
+            this.angle = angle;
+        }
+    }
+
     public void spawnDebugObjects(@NotNull Player player, @NotNull DebugObjectContainer container, boolean follow, @NotNull String type) {
         UUID containerId = container.getId();
 
@@ -149,6 +229,7 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
             BaseObject object = switch (type.toLowerCase()) {
                 case "cube" -> getDebugCube(player, container, follow);
                 case "sphere" -> getDebugSphere(player, container, follow);
+                case "rotating-cube" -> getDebugRotatingCube(player, container, follow);
                 default -> throw new IllegalArgumentException("Invalid type: " + type);
             };
 

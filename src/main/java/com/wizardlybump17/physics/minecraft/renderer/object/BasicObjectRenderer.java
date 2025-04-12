@@ -6,9 +6,12 @@ import com.wizardlybump17.physics.three.object.BaseObject;
 import com.wizardlybump17.physics.three.shape.Cube;
 import com.wizardlybump17.physics.three.shape.Shape;
 import com.wizardlybump17.physics.three.shape.Sphere;
+import com.wizardlybump17.physics.three.shape.rotating.RotatingCube;
 import org.bukkit.Color;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 public class BasicObjectRenderer extends WorldObjectRenderer {
 
@@ -16,6 +19,10 @@ public class BasicObjectRenderer extends WorldObjectRenderer {
     public static final @NotNull Color CUBE_COLLIDING_COLOR = Color.BLUE;
     public static final @NotNull Color SPHERE_COLOR = Color.PURPLE;
     public static final @NotNull Color SPHERE_COLLIDING_COLOR = Color.RED;
+
+    public static final @NotNull Color ROTATING_CUBE_COLOR = Color.YELLOW;
+    public static final @NotNull Color ROTATING_CUBE_COLLIDING_COLOR = Color.GREEN;
+
     public static final float SIZE = 0.2F;
 
     public BasicObjectRenderer(@NotNull BaseObjectContainer container) {
@@ -55,6 +62,24 @@ public class BasicObjectRenderer extends WorldObjectRenderer {
                                 drawPoint(viewer, x, y, z, color, SIZE);
                         }
                     }
+                }
+            }
+            case RotatingCube cube -> {
+                Color color = hasCollisions ? ROTATING_CUBE_COLLIDING_COLOR : ROTATING_CUBE_COLOR;
+
+                List<Vector3D> points = cube.getTransformedPoints();
+                for (int i = 0; i < points.size(); i++) {
+                    Vector3D current = points.get(i);
+                    Vector3D next = points.get((i + 1) % points.size());
+
+                    Vector3D normalize = next.subtract(current).normalize();
+                    double distance = current.distance(next);
+                    for (double j = 0; j <= distance; j += 0.1) {
+                        Vector3D target = normalize.multiply(j).add(current);
+                        drawPoint(viewer, target, color, SIZE);
+                    }
+
+                    color = Color.fromRGB((color.asRGB() + 5) % 0xFFFFFF);
                 }
             }
             default -> {
