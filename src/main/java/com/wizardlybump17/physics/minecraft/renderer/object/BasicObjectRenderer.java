@@ -79,6 +79,8 @@ public class BasicObjectRenderer extends WorldObjectRenderer {
                         drawPoint(viewer, target, color, SIZE);
                     }
 
+                    drawPoint(viewer, current, Color.RED, SIZE);
+
                     color = Color.fromRGB((color.asRGB() + 5) % 0xFFFFFF);
                 }
             }
