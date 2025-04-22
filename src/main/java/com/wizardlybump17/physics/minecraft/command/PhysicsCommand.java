@@ -14,6 +14,7 @@ import com.wizardlybump17.physics.three.registry.BaseObjectContainerRegistry;
 import com.wizardlybump17.physics.three.shape.Cube;
 import com.wizardlybump17.physics.three.shape.Sphere;
 import com.wizardlybump17.physics.three.shape.rotating.RotatingCube;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.Command;
@@ -24,8 +25,9 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 public class PhysicsCommand implements CommandExecutor, TabCompleter {
 
@@ -81,6 +83,17 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
                                 spawnDebugObjects(player, container, true, type);
                             }
                             case "toggle" -> {
+                                if (args.length == 4) {
+                                    try {
+                                        BaseObject object = container.getObject(Integer.parseInt(args[3]));
+                                        if (object instanceof DebugObject debugObject)
+                                            debugObject.setFollowing(!debugObject.isFollowing());
+                                    } catch (NumberFormatException e) {
+                                        player.sendMessage(Component.text("Invalid id."));
+                                    }
+                                    return false;
+                                }
+
                                 for (BaseObject object : container.getLoadedObjects()) {
                                     if (object instanceof DebugObject debugObject)
                                         debugObject.setFollowing(!debugObject.isFollowing());
@@ -180,6 +193,8 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
             container.addObject(object);
 
             renderer.addViewer(player);
+
+            player.sendMessage(Component.text(object.getId()));
         });
     }
 }
