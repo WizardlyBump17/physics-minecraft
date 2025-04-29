@@ -1,4 +1,4 @@
-package com.wizardlybump17.physics.minecraft.renderer.object;
+package com.wizardlybump17.physics.minecraft.renderer.shape;
 
 import com.wizardlybump17.physics.three.Vector3D;
 import com.wizardlybump17.physics.three.container.BaseObjectContainer;
@@ -13,12 +13,12 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-public abstract class WorldObjectRenderer implements ObjectRenderer {
+public abstract class WorldShapeRenderer implements ShapeRenderer {
 
     private final @NotNull Set<Player> viewers = new HashSet<>();
     private final @NotNull BaseObjectContainer container;
 
-    public WorldObjectRenderer(@NotNull BaseObjectContainer container) {
+    public WorldShapeRenderer(@NotNull BaseObjectContainer container) {
         this.container = container;
     }
 
