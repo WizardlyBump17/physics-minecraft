@@ -173,12 +173,12 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
         return List.of();
     }
 
-    public static @NotNull BasicObject getDebugCube(@NotNull Player player, boolean follow) {
+    public static @NotNull BasicObject getDebugCube(@NotNull Player player) {
         Location location = player.getLocation();
         return new BasicObject(
                 new Cube(
                         Converter.convert(location.toVector()),
-                        follow ? Converter.convert(location.toVector()).add(0.3, 0.3, 0.3) : Converter.convert(location.toVector()).add(1, 1, 1)
+                        Converter.convert(location.toVector()).add(1, 1, 1)
                 )
         );
     }
@@ -218,7 +218,7 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
         UUID containerId = container.getId();
 
         BaseObject object = switch (type.toLowerCase()) {
-            case "cube" -> getDebugCube(player, follow);
+            case "cube" -> getDebugCube(player);
             case "sphere" -> getDebugSphere(player);
             case "rotating-cube" -> getDebugRotatingCube(player);
             default -> throw new IllegalArgumentException("Invalid type: " + type);
@@ -227,7 +227,7 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
 
         shapeRendererTask.getRenderers(shape.getClass(), containerId).stream().findFirst().ifPresent(renderer -> {
             DebugObjectGroup group = new DebugObjectGroup(object, container, player, follow, false);
-            container.addGroup(group);
+            Engine.getScheduler().schedule(() -> container.addGroup(group));
 
             renderer.addViewer(player);
 
