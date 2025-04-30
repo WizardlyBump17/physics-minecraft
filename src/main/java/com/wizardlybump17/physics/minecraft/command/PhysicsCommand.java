@@ -122,7 +122,7 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
                         ) {
                             @Override
                             public boolean isPassable() {
-                                return true;
+                                return false;
                             }
 
                             @Override

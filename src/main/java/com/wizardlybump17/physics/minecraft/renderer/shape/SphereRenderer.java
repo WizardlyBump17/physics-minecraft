@@ -24,15 +24,47 @@ public class SphereRenderer extends WorldShapeRenderer {
 
         double radius = sphere.getRadius();
         Vector3D position = sphere.getPosition();
-        Vector3D min = position.subtract(radius, radius, radius);
-        Vector3D max = position.add(radius, radius, radius);
-        for (double x = min.x(); x <= max.x(); x += 0.1) {
-            for (double y = min.y(); y <= max.y(); y += 0.1) {
-                for (double z = min.z(); z <= max.z(); z += 0.1) {
-                    if (sphere.hasPoint(new Vector3D(x, y, z)))
-                        drawPoint(viewer, x, y, z, COLOR, SIZE);
-                }
-            }
+
+        int segments = (int) (Math.PI * radius * 2 * 10);
+
+        for (int i = 0; i < segments; i++) {
+            double angle = (double) i / segments * Math.PI * 2;
+            double x = radius * Math.cos(angle);
+            double y = radius * Math.sin(angle);
+            double z = 0;
+            drawPoint(viewer, position.add(x, y, z), COLOR, SIZE);
+        }
+
+        for (int i = 0; i < segments; i++) {
+            double angle = (double) i / segments * Math.PI * 2;
+            double x = radius * Math.sin(angle);
+            double y = 0;
+            double z = radius * Math.cos(angle);
+            drawPoint(viewer, position.add(x, y, z), COLOR, SIZE);
+        }
+
+        for (int i = 0; i < segments; i++) {
+            double angle = (double) i / segments * Math.PI * 2;
+            double x = 0;
+            double y = radius * Math.sin(angle);
+            double z = radius * Math.cos(angle);
+            drawPoint(viewer, position.add(x, y, z), COLOR, SIZE);
+        }
+
+        for (int i = 0; i <= segments; i++) {
+            double angle = (double) i / segments * Math.PI * 2;
+            double x = radius * Math.sin(angle) * Math.cos(Math.PI / 4);
+            double y = radius * Math.sin(angle) * Math.sin(Math.PI / 4);
+            double z = radius * Math.cos(angle);
+            drawPoint(viewer, position.add(x, y, z), COLOR, SIZE);
+        }
+
+        for (int i = 0; i <= segments; i++) {
+            double angle = (double) i / segments * Math.PI * 2;
+            double x = radius * Math.sin(angle) * Math.cos(-Math.PI / 4);
+            double y = radius * Math.sin(angle) * Math.sin(-Math.PI / 4);
+            double z = radius * Math.cos(angle);
+            drawPoint(viewer, position.add(x, y, z), COLOR, SIZE);
         }
     }
 
