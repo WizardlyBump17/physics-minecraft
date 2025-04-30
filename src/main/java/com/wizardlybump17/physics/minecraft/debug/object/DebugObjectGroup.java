@@ -18,8 +18,8 @@ public class DebugObjectGroup extends PhysicsObjectsGroup {
     private boolean canFollow;
     private boolean checkMaxMovement;
 
-    public DebugObjectGroup(@NotNull BaseObject object, @NotNull DebugObjectContainer container, @NotNull Player player, boolean canFollow, boolean checkMaxMovement) {
-        super(container, List.of(object));
+    public DebugObjectGroup(@NotNull List<BaseObject> objects, @NotNull DebugObjectContainer container, @NotNull Player player, boolean canFollow, boolean checkMaxMovement) {
+        super(container, objects);
         this.player = player;
         this.canFollow = canFollow;
         this.checkMaxMovement = checkMaxMovement;
