@@ -24,12 +24,26 @@ public class CubeRenderer extends WorldShapeRenderer {
 
         Vector3D min = cube.getMin();
         Vector3D max = cube.getMax();
+
         for (double x = min.x(); x <= max.x(); x += 0.1) {
-            for (double y = min.y(); y <= max.y(); y += 0.1) {
-                for (double z = min.z(); z <= max.z(); z += 0.1) {
-                    drawPoint(viewer, x, y, z, COLOR, SIZE);
-                }
-            }
+            drawPoint(viewer, x, min.y(), min.z(), COLOR, SIZE);
+            drawPoint(viewer, x, max.y(), min.z(), COLOR, SIZE);
+            drawPoint(viewer, x, min.y(), max.z(), COLOR, SIZE);
+            drawPoint(viewer, x, max.y(), max.z(), COLOR, SIZE);
+        }
+
+        for (double y = min.y(); y <= max.y(); y += 0.1) {
+            drawPoint(viewer, min.x(), y, min.z(), COLOR, SIZE);
+            drawPoint(viewer, max.x(), y, min.z(), COLOR, SIZE);
+            drawPoint(viewer, min.x(), y, max.z(), COLOR, SIZE);
+            drawPoint(viewer, max.x(), y, max.z(), COLOR, SIZE);
+        }
+
+        for (double z = min.z(); z <= max.z(); z += 0.1) {
+            drawPoint(viewer, min.x(), min.y(), z, COLOR, SIZE);
+            drawPoint(viewer, max.x(), min.y(), z, COLOR, SIZE);
+            drawPoint(viewer, min.x(), max.y(), z, COLOR, SIZE);
+            drawPoint(viewer, max.x(), max.y(), z, COLOR, SIZE);
         }
     }
 
