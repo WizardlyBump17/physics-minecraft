@@ -25,7 +25,6 @@ public class DebugObjectGroup extends PhysicsObjectsGroup {
     private boolean following = true;
     private boolean canFollow;
     private boolean checkMaxMovement;
-    private boolean success;
 
     public DebugObjectGroup(@NotNull List<BaseObject> objects, @NotNull DebugObjectContainer container, @NotNull Player player, boolean canFollow, boolean checkMaxMovement) {
         super(container, objects);
@@ -43,7 +42,8 @@ public class DebugObjectGroup extends PhysicsObjectsGroup {
     public void tick() {
         DebugObjectContainer container = (DebugObjectContainer) getContainer();
 
-//        super.tick();
+        if (!checkMaxMovement)
+            super.tick();
 
         if (!canFollow || !following)
             return;
@@ -56,14 +56,12 @@ public class DebugObjectGroup extends PhysicsObjectsGroup {
         Vector3D currentPosition = getCenter();
 
         if (checkMaxMovement) {
-            Vector3D movement = targetPosition.subtract(currentPosition);
-            if (movement.lengthSquared() > 0)
-                System.out.println(movement);
-            Vector3D maxMovement = getMaxMovement(movement);
-            targetPosition = currentPosition.add(maxMovement);
+            setVelocity(targetPosition.subtract(currentPosition));
+            super.tick();
+        } else {
+            setVelocity(Vector3D.ZERO);
+            setCenter(targetPosition);
         }
-
-        setCenter(targetPosition);
     }
 
     public @NotNull Player getPlayer() {
