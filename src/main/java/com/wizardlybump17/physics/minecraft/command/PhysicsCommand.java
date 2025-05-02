@@ -37,9 +37,11 @@ import java.util.UUID;
 public class PhysicsCommand implements CommandExecutor, TabCompleter {
 
     private final @NotNull ShapeRendererTask shapeRendererTask;
+    private final @NotNull Engine engine;
 
-    public PhysicsCommand(@NotNull ShapeRendererTask shapeRendererTask) {
+    public PhysicsCommand(@NotNull ShapeRendererTask shapeRendererTask, @NotNull Engine engine) {
         this.shapeRendererTask = shapeRendererTask;
+        this.engine = engine;
     }
 
     public @NotNull ShapeRendererTask getShapeRendererTask() {
@@ -51,7 +53,7 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
         if (args.length == 0 || !(sender instanceof Player player))
             return false;
 
-        BaseObjectContainerRegistry containerRegistry = Engine.getObjectContainerRegistry();
+        BaseObjectContainerRegistry containerRegistry = engine.getObjectContainerRegistry();
         World world = player.getWorld();
 
         DebugObjectContainer container = (DebugObjectContainer) containerRegistry.get(DebugObjectContainer.getId(world))
@@ -227,7 +229,7 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
 
         shapeRendererTask.getRenderers(shape.getClass(), containerId).stream().findFirst().ifPresent(renderer -> {
             DebugObjectGroup group = new DebugObjectGroup(List.of(object, new BasicObject(object.getShape().at(object.getShape().getPosition().add(3, 0, 0)))), container, player, follow, false);
-            Engine.getScheduler().schedule(() -> container.addGroup(group));
+            engine.getScheduler().schedule(() -> container.addGroup(group));
 
             renderer.addViewer(player);
 

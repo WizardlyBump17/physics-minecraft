@@ -7,7 +7,6 @@ import com.wizardlybump17.physics.task.scheduler.TaskScheduler;
 import com.wizardlybump17.physics.three.Engine;
 import com.wizardlybump17.physics.three.container.BaseObjectContainer;
 import com.wizardlybump17.physics.three.registry.BaseObjectContainerRegistry;
-import com.wizardlybump17.physics.three.thread.EngineThread;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -16,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 public class PhysicsMinecraft extends JavaPlugin {
 
     private ShapeRendererTask shapeRendererTask;
+    private Engine engine;
 
     @Override
     public void onLoad() {
@@ -24,13 +24,7 @@ public class PhysicsMinecraft extends JavaPlugin {
     }
 
     private void startEngine() {
-        BaseObjectContainerRegistry containerRegistry = new BaseObjectContainerRegistry();
-        TaskScheduler scheduler = new TaskScheduler(new RegisteredTaskFactory());
-        EngineThread thread = new EngineThread(scheduler, containerRegistry);
-
-        Engine.start(containerRegistry, scheduler);
-
-        thread.start();
+        engine = Engine.start(new BaseObjectContainerRegistry(), new TaskScheduler(new RegisteredTaskFactory()));
     }
 
     @Override
@@ -40,13 +34,13 @@ public class PhysicsMinecraft extends JavaPlugin {
         new BukkitRunnable() {
             @Override
             public void run() {
-                for (BaseObjectContainer container : Engine.getObjectContainerRegistry().getValues())
+                for (BaseObjectContainer container : engine.getObjectContainerRegistry().getValues())
                     container.tick();
             }
         }.runTaskTimer(this, 0, 1);
 
         PluginCommand physicsCommand = getCommand("physics");
-        PhysicsCommand physicsExecutor = new PhysicsCommand(shapeRendererTask);
+        PhysicsCommand physicsExecutor = new PhysicsCommand(shapeRendererTask, engine);
         physicsCommand.setExecutor(physicsExecutor);
         physicsCommand.setTabCompleter(physicsExecutor);
     }
@@ -56,7 +50,12 @@ public class PhysicsMinecraft extends JavaPlugin {
         if (shapeRendererTask != null)
             shapeRendererTask.clear();
 
-        Engine.shutdown();
+        if (engine != null)
+            engine.shutdown();
+    }
+
+    public Engine getEngine() {
+        return engine;
     }
 
     public static @NotNull PhysicsMinecraft getInstance() {

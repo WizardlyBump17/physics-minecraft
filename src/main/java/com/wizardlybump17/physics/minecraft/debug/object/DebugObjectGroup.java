@@ -35,7 +35,7 @@ public class DebugObjectGroup extends PhysicsObjectsGroup {
 
     @Override
     public boolean isPassable() {
-        return true;
+        return false;
     }
 
     @Override
