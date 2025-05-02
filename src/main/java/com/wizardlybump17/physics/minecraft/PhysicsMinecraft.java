@@ -56,6 +56,10 @@ public class PhysicsMinecraft extends JavaPlugin {
         return engine;
     }
 
+    public ShapeRendererTask getShapeRendererTask() {
+        return shapeRendererTask;
+    }
+
     public static @NotNull PhysicsMinecraft getInstance() {
         return getPlugin(PhysicsMinecraft.class);
     }
