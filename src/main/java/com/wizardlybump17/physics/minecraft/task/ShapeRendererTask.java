@@ -80,4 +80,17 @@ public class ShapeRendererTask extends BukkitRunnable {
             }
         }
     }
+
+
+    public void addViewer(@NotNull Player viewer) {
+        renderers.values().forEach(renderers -> renderers.forEach(renderer -> renderer.addViewer(viewer)));
+    }
+
+    public void removeViewer(@NotNull Player viewer) {
+        renderers.values().forEach(renderers -> renderers.forEach(renderer -> renderer.removeViewer(viewer)));
+    }
+
+    public boolean hasViewer(@NotNull Player viewer) {
+        return renderers.values().stream().anyMatch(renderers -> renderers.stream().anyMatch(renderer -> renderer.hasViewer(viewer)));
+    }
 }
