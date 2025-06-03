@@ -1,8 +1,8 @@
 package com.wizardlybump17.physics.minecraft.command;
 
 import com.wizardlybump17.physics.minecraft.Converter;
-import com.wizardlybump17.physics.minecraft.debug.DebugObjectContainer;
-import com.wizardlybump17.physics.minecraft.debug.object.DebugObjectGroup;
+import com.wizardlybump17.physics.minecraft.debug.DebugShapesGroupsContainer;
+import com.wizardlybump17.physics.minecraft.debug.group.DebugShapesGroup;
 import com.wizardlybump17.physics.minecraft.renderer.shape.CubeRenderer;
 import com.wizardlybump17.physics.minecraft.renderer.shape.RotatingCubeRenderer;
 import com.wizardlybump17.physics.minecraft.renderer.shape.SphereRenderer;
@@ -52,9 +52,9 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
         ShapesGroupsContainerRegistry containerRegistry = engine.getShapesGroupsContainerRegistry();
         World world = player.getWorld();
 
-        DebugObjectContainer container = (DebugObjectContainer) containerRegistry.get(DebugObjectContainer.getId(world))
+        DebugShapesGroupsContainer container = (DebugShapesGroupsContainer) containerRegistry.get(DebugShapesGroupsContainer.getId(world))
                 .orElseGet(() -> {
-                    DebugObjectContainer newContainer = new DebugObjectContainer(world);
+                    DebugShapesGroupsContainer newContainer = new DebugShapesGroupsContainer(world);
                     containerRegistry.register(newContainer);
 
                     shapeRendererTask.addRenderer(new CubeRenderer(newContainer));
@@ -87,9 +87,9 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
                                 if (args.length == 4) {
                                     try {
                                         ShapesGroup group = container.getGroup(Integer.parseInt(args[3]));
-                                        if (group instanceof DebugObjectGroup debugGroup)
+                                        if (group instanceof DebugShapesGroup debugGroup)
                                             debugGroup.setFollowing(!debugGroup.isFollowing());
-                                        player.sendMessage(Component.text("Following: " + (group instanceof DebugObjectGroup debugGroup && debugGroup.isFollowing())));
+                                        player.sendMessage(Component.text("Following: " + (group instanceof DebugShapesGroup debugGroup && debugGroup.isFollowing())));
                                     } catch (NumberFormatException e) {
                                         player.sendMessage(Component.text("Invalid id."));
                                     }
@@ -97,7 +97,7 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
                                 }
 
                                 for (ShapesGroup group : container.getShapesGroups()) {
-                                    if (group instanceof DebugObjectGroup debugGroup)
+                                    if (group instanceof DebugShapesGroup debugGroup)
                                         debugGroup.setFollowing(!debugGroup.isFollowing());
                                 }
                             }
@@ -140,9 +140,9 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
                                 if (args.length == 4) {
                                     try {
                                         ShapesGroup group = container.getGroup(Integer.parseInt(args[3]));
-                                        if (group instanceof DebugObjectGroup debugGroup)
+                                        if (group instanceof DebugShapesGroup debugGroup)
                                             debugGroup.setCheckMaxMovement(!debugGroup.isCheckMaxMovement());
-                                        player.sendMessage(Component.text("Checking max movement: " + (group instanceof DebugObjectGroup debugGroup && debugGroup.isCheckMaxMovement())));
+                                        player.sendMessage(Component.text("Checking max movement: " + (group instanceof DebugShapesGroup debugGroup && debugGroup.isCheckMaxMovement())));
                                     } catch (NumberFormatException e) {
                                         player.sendMessage(Component.text("Invalid id."));
                                     }
@@ -150,7 +150,7 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
                                 }
 
                                 for (ShapesGroup group : container.getShapesGroups()) {
-                                    if (group instanceof DebugObjectGroup debugGroup)
+                                    if (group instanceof DebugShapesGroup debugGroup)
                                         debugGroup.setFollowing(!debugGroup.isCheckMaxMovement());
                                 }
                             }
@@ -202,7 +202,7 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
         );
     }
 
-    public void spawnDebugObjects(@NotNull Player player, @NotNull DebugObjectContainer container, boolean follow, @NotNull String type) {
+    public void spawnDebugObjects(@NotNull Player player, @NotNull DebugShapesGroupsContainer container, boolean follow, @NotNull String type) {
         UUID containerId = container.getId();
 
         Shape shape = switch (type.toLowerCase()) {
@@ -213,7 +213,7 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
         };
 
         shapeRendererTask.getRenderers(shape.getClass(), containerId).stream().findFirst().ifPresent(renderer -> {
-            DebugObjectGroup group = new DebugObjectGroup(List.of(shape, shape.at(shape.getPosition().add(3, 0, 0))), container, player, follow, false);
+            DebugShapesGroup group = new DebugShapesGroup(List.of(shape, shape.at(shape.getPosition().add(3, 0, 0))), container, player, follow, false);
             engine.getScheduler().schedule(() -> container.addGroup(group));
 
             renderer.addViewer(player);

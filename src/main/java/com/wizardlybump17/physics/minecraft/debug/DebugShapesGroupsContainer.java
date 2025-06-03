@@ -1,18 +1,18 @@
 package com.wizardlybump17.physics.minecraft.debug;
 
-import com.wizardlybump17.physics.three.container.MapShapesGroupsContainer;
+import com.wizardlybump17.physics.minecraft.container.MinecraftMapObjectContainer;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
-public class DebugObjectContainer extends MapShapesGroupsContainer {
+public class DebugShapesGroupsContainer extends MinecraftMapObjectContainer {
 
     private final @NotNull World world;
 
-    public DebugObjectContainer(@NotNull World world) {
-        super(getId(world));
+    public DebugShapesGroupsContainer(@NotNull World world) {
+        super(world, getId(world));
         this.world = world;
     }
 

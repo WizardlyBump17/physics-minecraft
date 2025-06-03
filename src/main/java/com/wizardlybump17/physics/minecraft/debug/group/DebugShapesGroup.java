@@ -1,9 +1,9 @@
-package com.wizardlybump17.physics.minecraft.debug.object;
+package com.wizardlybump17.physics.minecraft.debug.group;
 
 import com.wizardlybump17.physics.minecraft.Converter;
-import com.wizardlybump17.physics.minecraft.debug.DebugObjectContainer;
+import com.wizardlybump17.physics.minecraft.debug.DebugShapesGroupsContainer;
+import com.wizardlybump17.physics.minecraft.group.MinecraftPhysicsShapesGroup;
 import com.wizardlybump17.physics.three.Vector3D;
-import com.wizardlybump17.physics.three.group.PhysicsShapesGroup;
 import com.wizardlybump17.physics.three.shape.Cube;
 import com.wizardlybump17.physics.three.shape.Shape;
 import io.papermc.paper.util.CollisionUtil;
@@ -19,14 +19,14 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DebugObjectGroup extends PhysicsShapesGroup {
+public class DebugShapesGroup extends MinecraftPhysicsShapesGroup {
 
     private final @NotNull Player player;
     private boolean following = true;
     private boolean canFollow;
     private boolean checkMaxMovement;
 
-    public DebugObjectGroup(@NotNull List<Shape> shapes, @NotNull DebugObjectContainer container, @NotNull Player player, boolean canFollow, boolean checkMaxMovement) {
+    public DebugShapesGroup(@NotNull List<Shape> shapes, @NotNull DebugShapesGroupsContainer container, @NotNull Player player, boolean canFollow, boolean checkMaxMovement) {
         super(container, shapes);
         this.player = player;
         this.canFollow = canFollow;
@@ -34,13 +34,8 @@ public class DebugObjectGroup extends PhysicsShapesGroup {
     }
 
     @Override
-    public boolean isPassable() {
-        return false;
-    }
-
-    @Override
     public void tick() {
-        DebugObjectContainer container = (DebugObjectContainer) getContainer();
+        DebugShapesGroupsContainer container = (DebugShapesGroupsContainer) getContainer();
 
         if (!checkMaxMovement)
             super.tick();
@@ -137,7 +132,7 @@ public class DebugObjectGroup extends PhysicsShapesGroup {
             return movement;
         }
 
-        final Level world = ((CraftWorld) ((DebugObjectContainer) getContainer()).getWorld()).getHandle();
+        final Level world = ((CraftWorld) ((DebugShapesGroupsContainer) getContainer()).getWorld()).getHandle();
         final AABB currBoundingBox = new AABB(convert(cube.getMin()), convert(cube.getMax()));
 
         if (CollisionUtil.isEmpty(currBoundingBox)) {
