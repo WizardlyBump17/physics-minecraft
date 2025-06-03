@@ -1,13 +1,13 @@
 package com.wizardlybump17.physics.minecraft.debug;
 
-import com.wizardlybump17.physics.three.container.MapObjectContainer;
+import com.wizardlybump17.physics.three.container.MapShapesGroupsContainer;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
-public class DebugObjectContainer extends MapObjectContainer {
+public class DebugObjectContainer extends MapShapesGroupsContainer {
 
     private final @NotNull World world;
 

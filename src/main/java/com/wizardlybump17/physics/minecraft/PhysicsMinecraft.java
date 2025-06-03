@@ -5,7 +5,7 @@ import com.wizardlybump17.physics.minecraft.task.ShapeRendererTask;
 import com.wizardlybump17.physics.task.factory.RegisteredTaskFactory;
 import com.wizardlybump17.physics.task.scheduler.TaskScheduler;
 import com.wizardlybump17.physics.three.Engine;
-import com.wizardlybump17.physics.three.registry.BaseObjectContainerRegistry;
+import com.wizardlybump17.physics.three.registry.ShapesGroupsContainerRegistry;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -18,7 +18,7 @@ public class PhysicsMinecraft extends JavaPlugin {
     @Override
     public void onLoad() {
         shapeRendererTask = new ShapeRendererTask();
-        engine = Engine.start(new BaseObjectContainerRegistry(), new TaskScheduler(new RegisteredTaskFactory()));
+        engine = Engine.start(new ShapesGroupsContainerRegistry(), new TaskScheduler(new RegisteredTaskFactory()));
     }
 
     @Override

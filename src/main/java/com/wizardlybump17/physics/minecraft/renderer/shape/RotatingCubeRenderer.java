@@ -1,7 +1,7 @@
 package com.wizardlybump17.physics.minecraft.renderer.shape;
 
 import com.wizardlybump17.physics.three.Vector3D;
-import com.wizardlybump17.physics.three.container.ShapesGroupContainer;
+import com.wizardlybump17.physics.three.container.ShapesGroupsContainer;
 import com.wizardlybump17.physics.three.shape.Shape;
 import com.wizardlybump17.physics.three.shape.rotating.RotatingCube;
 import org.bukkit.Color;
@@ -16,7 +16,7 @@ public class RotatingCubeRenderer extends WorldShapeRenderer {
 
     public static final float SIZE = 0.2F;
 
-    public RotatingCubeRenderer(@NotNull ShapesGroupContainer container) {
+    public RotatingCubeRenderer(@NotNull ShapesGroupsContainer container) {
         super(container);
     }
 

@@ -11,7 +11,7 @@ import com.wizardlybump17.physics.three.Engine;
 import com.wizardlybump17.physics.three.Vector3D;
 import com.wizardlybump17.physics.three.group.PhysicsShapesGroup;
 import com.wizardlybump17.physics.three.group.ShapesGroup;
-import com.wizardlybump17.physics.three.registry.BaseObjectContainerRegistry;
+import com.wizardlybump17.physics.three.registry.ShapesGroupsContainerRegistry;
 import com.wizardlybump17.physics.three.shape.Cube;
 import com.wizardlybump17.physics.three.shape.Shape;
 import com.wizardlybump17.physics.three.shape.Sphere;
@@ -49,7 +49,7 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
         if (args.length == 0 || !(sender instanceof Player player))
             return false;
 
-        BaseObjectContainerRegistry containerRegistry = engine.getObjectContainerRegistry();
+        ShapesGroupsContainerRegistry containerRegistry = engine.getShapesGroupsContainerRegistry();
         World world = player.getWorld();
 
         DebugObjectContainer container = (DebugObjectContainer) containerRegistry.get(DebugObjectContainer.getId(world))

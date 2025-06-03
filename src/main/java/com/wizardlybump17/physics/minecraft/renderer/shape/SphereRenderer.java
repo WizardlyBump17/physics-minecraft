@@ -1,7 +1,7 @@
 package com.wizardlybump17.physics.minecraft.renderer.shape;
 
 import com.wizardlybump17.physics.three.Vector3D;
-import com.wizardlybump17.physics.three.container.ShapesGroupContainer;
+import com.wizardlybump17.physics.three.container.ShapesGroupsContainer;
 import com.wizardlybump17.physics.three.shape.Shape;
 import com.wizardlybump17.physics.three.shape.Sphere;
 import org.bukkit.Color;
@@ -14,7 +14,7 @@ public class SphereRenderer extends WorldShapeRenderer {
 
     public static final float SIZE = 0.2F;
 
-    public SphereRenderer(@NotNull ShapesGroupContainer container) {
+    public SphereRenderer(@NotNull ShapesGroupsContainer container) {
         super(container);
     }
 

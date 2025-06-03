@@ -2,7 +2,7 @@ package com.wizardlybump17.physics.minecraft.task;
 
 import com.wizardlybump17.physics.minecraft.renderer.shape.ShapeRenderer;
 import com.wizardlybump17.physics.minecraft.renderer.shape.WorldShapeRenderer;
-import com.wizardlybump17.physics.three.container.ShapesGroupContainer;
+import com.wizardlybump17.physics.three.container.ShapesGroupsContainer;
 import com.wizardlybump17.physics.three.group.ShapesGroup;
 import com.wizardlybump17.physics.three.shape.Shape;
 import org.bukkit.entity.Player;
@@ -72,7 +72,7 @@ public class ShapeRendererTask extends BukkitRunnable {
 
     protected void renderWorldRenderer(@NotNull WorldShapeRenderer renderer) {
         for (Player viewer : renderer.getViewers()) {
-            ShapesGroupContainer container = renderer.getContainer();
+            ShapesGroupsContainer container = renderer.getContainer();
             for (ShapesGroup group : container.getShapesGroups()) {
                 for (Shape shape : group.getShapes()) {
                     if (renderer.isValidShape(shape))
