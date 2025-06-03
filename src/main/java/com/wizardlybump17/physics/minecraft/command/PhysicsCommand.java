@@ -5,15 +5,12 @@ import com.wizardlybump17.physics.minecraft.debug.DebugObjectContainer;
 import com.wizardlybump17.physics.minecraft.debug.object.DebugObjectGroup;
 import com.wizardlybump17.physics.minecraft.renderer.shape.CubeRenderer;
 import com.wizardlybump17.physics.minecraft.renderer.shape.RotatingCubeRenderer;
-import com.wizardlybump17.physics.minecraft.renderer.shape.ShapeRenderer;
 import com.wizardlybump17.physics.minecraft.renderer.shape.SphereRenderer;
 import com.wizardlybump17.physics.minecraft.task.ShapeRendererTask;
 import com.wizardlybump17.physics.three.Engine;
 import com.wizardlybump17.physics.three.Vector3D;
-import com.wizardlybump17.physics.three.group.ObjectsGroup;
-import com.wizardlybump17.physics.three.group.PhysicsObjectsGroup;
-import com.wizardlybump17.physics.three.object.BaseObject;
-import com.wizardlybump17.physics.three.object.BasicObject;
+import com.wizardlybump17.physics.three.group.PhysicsShapesGroup;
+import com.wizardlybump17.physics.three.group.ShapesGroup;
 import com.wizardlybump17.physics.three.registry.BaseObjectContainerRegistry;
 import com.wizardlybump17.physics.three.shape.Cube;
 import com.wizardlybump17.physics.three.shape.Shape;
@@ -31,7 +28,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 public class PhysicsCommand implements CommandExecutor, TabCompleter {
@@ -74,13 +70,9 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
 
                 switch (args[1].toLowerCase()) {
                     case "clear" -> {
-                        for (Set<ShapeRenderer> renderers : shapeRendererTask.getRenderers(container.getId()).values()) {
-                            for (ShapeRenderer renderer : renderers) {
-                                renderer.removeViewer(player);
-                                for (ObjectsGroup group : container.getObjectsGroups())
-                                    container.removeGroup(group);
-                            }
-                        }
+                        List<ShapesGroup> groups = List.copyOf(container.getShapesGroups());
+                        for (ShapesGroup group : groups)
+                            container.removeGroup(group);
                     }
                     case "follow" -> {
                         if (args.length == 2)
@@ -94,7 +86,7 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
                             case "toggle" -> {
                                 if (args.length == 4) {
                                     try {
-                                        ObjectsGroup group = container.getGroup(Integer.parseInt(args[3]));
+                                        ShapesGroup group = container.getGroup(Integer.parseInt(args[3]));
                                         if (group instanceof DebugObjectGroup debugGroup)
                                             debugGroup.setFollowing(!debugGroup.isFollowing());
                                         player.sendMessage(Component.text("Following: " + (group instanceof DebugObjectGroup debugGroup && debugGroup.isFollowing())));
@@ -104,7 +96,7 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
                                     return false;
                                 }
 
-                                for (ObjectsGroup group : container.getObjectsGroups()) {
+                                for (ShapesGroup group : container.getShapesGroups()) {
                                     if (group instanceof DebugObjectGroup debugGroup)
                                         debugGroup.setFollowing(!debugGroup.isFollowing());
                                 }
@@ -116,9 +108,9 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
                         spawnDebugObjects(player, container, false, type);
                     }
                     case "physics" -> {
-                        container.addGroup(new PhysicsObjectsGroup(
+                        container.addGroup(new PhysicsShapesGroup(
                                 container,
-                                List.of(new BasicObject(new Sphere(Converter.convert(player.getEyeLocation().toVector()), 1))),
+                                List.of(new Sphere(Converter.convert(player.getEyeLocation().toVector()), 1)),
                                 new Vector3D(0, -9.8, 0).inMetersPerTick(),
                                 Vector3D.ZERO
                         ) {
@@ -147,7 +139,7 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
                             case "toggle" -> {
                                 if (args.length == 4) {
                                     try {
-                                        ObjectsGroup group = container.getGroup(Integer.parseInt(args[3]));
+                                        ShapesGroup group = container.getGroup(Integer.parseInt(args[3]));
                                         if (group instanceof DebugObjectGroup debugGroup)
                                             debugGroup.setCheckMaxMovement(!debugGroup.isCheckMaxMovement());
                                         player.sendMessage(Component.text("Checking max movement: " + (group instanceof DebugObjectGroup debugGroup && debugGroup.isCheckMaxMovement())));
@@ -157,7 +149,7 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
                                     return false;
                                 }
 
-                                for (ObjectsGroup group : container.getObjectsGroups()) {
+                                for (ShapesGroup group : container.getShapesGroups()) {
                                     if (group instanceof DebugObjectGroup debugGroup)
                                         debugGroup.setFollowing(!debugGroup.isCheckMaxMovement());
                                 }
@@ -175,60 +167,53 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
         return List.of();
     }
 
-    public static @NotNull BasicObject getDebugCube(@NotNull Player player) {
+    public static @NotNull Cube getDebugCube(@NotNull Player player) {
         Location location = player.getLocation();
-        return new BasicObject(
-                new Cube(
-                        Converter.convert(location.toVector()),
-                        Converter.convert(location.toVector()).add(1, 1, 1)
-                )
+        return new Cube(
+                Converter.convert(location.toVector()),
+                Converter.convert(location.toVector()).add(1, 1, 1)
         );
     }
 
-    public static @NotNull BasicObject getDebugSphere(@NotNull Player player) {
+    public static @NotNull Sphere getDebugSphere(@NotNull Player player) {
         Location location = player.getLocation();
-        return new BasicObject(
-                new Sphere(
-                        Converter.convert(location.toVector()),
-                        0.5
-                )
+        return new Sphere(
+                Converter.convert(location.toVector()),
+                0.5
         );
     }
 
-    public static @NotNull BasicObject getDebugRotatingCube(@NotNull Player player) {
+    public static @NotNull RotatingCube getDebugRotatingCube(@NotNull Player player) {
         Location location = player.getLocation();
-        return new BasicObject(
-                new RotatingCube(
-                        Converter.convert(location.toVector()),
-                        List.of(
-                                new Vector3D(-2, 1, -1),
-                                new Vector3D(-2, 1, 1),
-                                new Vector3D(2, 1, -1),
-                                new Vector3D(2, 1, 1),
-                                new Vector3D(-2, -1, -1),
-                                new Vector3D(-2, -1, 1),
-                                new Vector3D(2, -1, -1),
-                                new Vector3D(2, -1, 1),
-                                new Vector3D(2, -3, 1)
-                        ),
-                        Vector3D.ZERO
-                )
+        return new RotatingCube(
+                Converter.convert(location.toVector()),
+                List.of(
+                        new Vector3D(-2, 1, -1),
+                        new Vector3D(-2, 1, 1),
+                        new Vector3D(2, 1, -1),
+                        new Vector3D(2, 1, 1),
+                        new Vector3D(-2, -1, -1),
+                        new Vector3D(-2, -1, 1),
+                        new Vector3D(2, -1, -1),
+                        new Vector3D(2, -1, 1),
+                        new Vector3D(2, -3, 1)
+                ),
+                Vector3D.ZERO
         );
     }
 
     public void spawnDebugObjects(@NotNull Player player, @NotNull DebugObjectContainer container, boolean follow, @NotNull String type) {
         UUID containerId = container.getId();
 
-        BaseObject object = switch (type.toLowerCase()) {
+        Shape shape = switch (type.toLowerCase()) {
             case "cube" -> getDebugCube(player);
             case "sphere" -> getDebugSphere(player);
             case "rotating-cube" -> getDebugRotatingCube(player);
             default -> throw new IllegalArgumentException("Invalid type: " + type);
         };
-        Shape shape = object.getShape();
 
         shapeRendererTask.getRenderers(shape.getClass(), containerId).stream().findFirst().ifPresent(renderer -> {
-            DebugObjectGroup group = new DebugObjectGroup(List.of(object, new BasicObject(object.getShape().at(object.getShape().getPosition().add(3, 0, 0)))), container, player, follow, false);
+            DebugObjectGroup group = new DebugObjectGroup(List.of(shape, shape.at(shape.getPosition().add(3, 0, 0))), container, player, follow, false);
             engine.getScheduler().schedule(() -> container.addGroup(group));
 
             renderer.addViewer(player);

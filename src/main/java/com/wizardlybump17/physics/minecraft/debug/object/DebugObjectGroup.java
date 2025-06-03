@@ -3,9 +3,9 @@ package com.wizardlybump17.physics.minecraft.debug.object;
 import com.wizardlybump17.physics.minecraft.Converter;
 import com.wizardlybump17.physics.minecraft.debug.DebugObjectContainer;
 import com.wizardlybump17.physics.three.Vector3D;
-import com.wizardlybump17.physics.three.group.PhysicsObjectsGroup;
-import com.wizardlybump17.physics.three.object.BaseObject;
+import com.wizardlybump17.physics.three.group.PhysicsShapesGroup;
 import com.wizardlybump17.physics.three.shape.Cube;
+import com.wizardlybump17.physics.three.shape.Shape;
 import io.papermc.paper.util.CollisionUtil;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
@@ -19,15 +19,15 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DebugObjectGroup extends PhysicsObjectsGroup {
+public class DebugObjectGroup extends PhysicsShapesGroup {
 
     private final @NotNull Player player;
     private boolean following = true;
     private boolean canFollow;
     private boolean checkMaxMovement;
 
-    public DebugObjectGroup(@NotNull List<BaseObject> objects, @NotNull DebugObjectContainer container, @NotNull Player player, boolean canFollow, boolean checkMaxMovement) {
-        super(container, objects);
+    public DebugObjectGroup(@NotNull List<Shape> shapes, @NotNull DebugObjectContainer container, @NotNull Player player, boolean canFollow, boolean checkMaxMovement) {
+        super(container, shapes);
         this.player = player;
         this.canFollow = canFollow;
         this.checkMaxMovement = checkMaxMovement;
@@ -101,8 +101,8 @@ public class DebugObjectGroup extends PhysicsObjectsGroup {
         Vector3D closest = null;
         double closestDistance = Double.MAX_VALUE;
 
-        for (BaseObject object : getObjects().values()) {
-            if (!(object.getShape() instanceof Cube cube))
+        for (Shape shape : getShapes()) {
+            if (!(shape instanceof Cube cube))
                 continue;
 
             Vector3D maxMovement = convert(collide(convert(movement), cube));

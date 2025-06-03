@@ -1,7 +1,7 @@
 package com.wizardlybump17.physics.minecraft.renderer.shape;
 
 import com.wizardlybump17.physics.three.Vector3D;
-import com.wizardlybump17.physics.three.container.BaseObjectContainer;
+import com.wizardlybump17.physics.three.container.ShapesGroupContainer;
 import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
@@ -16,9 +16,9 @@ import java.util.Set;
 public abstract class WorldShapeRenderer implements ShapeRenderer {
 
     private final @NotNull Set<Player> viewers = new HashSet<>();
-    private final @NotNull BaseObjectContainer container;
+    private final @NotNull ShapesGroupContainer container;
 
-    public WorldShapeRenderer(@NotNull BaseObjectContainer container) {
+    public WorldShapeRenderer(@NotNull ShapesGroupContainer container) {
         this.container = container;
     }
 
@@ -34,7 +34,7 @@ public abstract class WorldShapeRenderer implements ShapeRenderer {
         viewer.spawnParticle(Particle.DUST, x, y, z, 1, new Particle.DustOptions(color, size));
     }
 
-    public @NotNull BaseObjectContainer getContainer() {
+    public @NotNull ShapesGroupContainer getContainer() {
         return container;
     }
 
