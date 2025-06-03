@@ -112,6 +112,7 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
                                 container,
                                 List.of(new Sphere(Converter.convert(player.getEyeLocation().toVector()), 1)),
                                 new Vector3D(0, -9.8, 0).inMetersPerTick(),
+                                Vector3D.ZERO,
                                 Vector3D.ZERO
                         ) {
                             @Override

@@ -13,11 +13,11 @@ public class MinecraftPhysicsShapesGroup extends PhysicsShapesGroup {
     private boolean passable;
 
     public MinecraftPhysicsShapesGroup(@NotNull MinecraftMapObjectContainer container, @NotNull List<Shape> shapes) {
-        this(container, shapes, Vector3D.ZERO, Vector3D.ZERO);
+        this(container, shapes, Vector3D.ZERO, Vector3D.ZERO, Vector3D.ZERO);
     }
 
-    public MinecraftPhysicsShapesGroup(@NotNull MinecraftMapObjectContainer container, @NotNull List<Shape> shapes, @NotNull Vector3D acceleration, @NotNull Vector3D velocity) {
-        super(container, shapes, acceleration, velocity);
+    public MinecraftPhysicsShapesGroup(@NotNull MinecraftMapObjectContainer container, @NotNull List<Shape> shapes, @NotNull Vector3D acceleration, @NotNull Vector3D velocity, @NotNull Vector3D rotation) {
+        super(container, shapes, acceleration, velocity, rotation);
     }
 
     @Override
