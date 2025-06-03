@@ -18,7 +18,11 @@ public class PhysicsMinecraft extends JavaPlugin {
     @Override
     public void onLoad() {
         shapeRendererTask = new ShapeRendererTask();
-        engine = Engine.start(new ShapesGroupsContainerRegistry(), new TaskScheduler(new RegisteredTaskFactory()));
+        engine = Engine.start(
+                new ShapesGroupsContainerRegistry(),
+                new TaskScheduler(new RegisteredTaskFactory()),
+                20
+        );
     }
 
     @Override

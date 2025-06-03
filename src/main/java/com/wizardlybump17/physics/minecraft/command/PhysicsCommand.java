@@ -111,7 +111,7 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
                         container.addGroup(new PhysicsShapesGroup(
                                 container,
                                 List.of(new Sphere(Converter.convert(player.getEyeLocation().toVector()), 1)),
-                                new Vector3D(0, -9.8, 0).inMetersPerTick(),
+                                new Vector3D(0, -9.8, 0).divide(engine.getTicksPerSecond()),
                                 Vector3D.ZERO,
                                 Vector3D.ZERO
                         ) {
