@@ -6,6 +6,7 @@ import com.wizardlybump17.physics.minecraft.group.MinecraftPhysicsShapesGroup;
 import com.wizardlybump17.physics.three.Vector3D;
 import com.wizardlybump17.physics.three.shape.Cube;
 import com.wizardlybump17.physics.three.shape.Shape;
+import com.wizardlybump17.physics.three.shape.rotating.RotatingCube;
 import io.papermc.paper.util.CollisionUtil;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
@@ -202,5 +203,16 @@ public class DebugShapesGroup extends MinecraftPhysicsShapesGroup {
             return limitedMoveVector;
         }
         // Paper end - optimise collisions
+    }
+
+    @Override
+    public void setRotation(@NotNull Vector3D rotation) {
+        super.setRotation(rotation);
+        getShapes().replaceAll(shape -> {
+            if (shape instanceof RotatingCube rotatable) {
+                shape = rotatable.setRotation(rotation);
+            }
+            return shape;
+        });
     }
 }

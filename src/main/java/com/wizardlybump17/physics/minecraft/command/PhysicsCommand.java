@@ -159,6 +159,52 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
                     }
                 }
             }
+
+            case "rotate" -> {
+                if (args.length < 3) {
+                    player.sendMessage(Component.text("Usage: /physics rotate <id> <rotation>"));
+                    return false;
+                }
+
+                int id;
+                try {
+                    id = Integer.parseInt(args[1]);
+                } catch (NumberFormatException e) {
+                    player.sendMessage(Component.text("Invalid id."));
+                    return false;
+                }
+
+                ShapesGroup group = container.getGroup(id);
+                if (group == null) {
+                    player.sendMessage(Component.text("Group not found."));
+                    return false;
+                }
+
+                String rotationString = args[2];
+                String[] split = rotationString.split(",");
+                if (split.length != 3) {
+                    player.sendMessage(Component.text("Invalid rotation format. Use 'x,y,z'."));
+                    return false;
+                }
+
+                Vector3D rotation;
+                try {
+                    rotation = new Vector3D(
+                            Double.parseDouble(split[0]),
+                            Double.parseDouble(split[1]),
+                            Double.parseDouble(split[2])
+                    );
+                } catch (NumberFormatException e) {
+                    player.sendMessage(Component.text("Invalid rotation values. Must be numbers."));
+                    return false;
+                }
+
+                if (group instanceof PhysicsShapesGroup physicsShapesGroup)
+                    physicsShapesGroup.setRotation(rotation);
+
+                player.sendMessage("Rotation of the group #" + id + " set to " + rotation);
+                return false;
+            }
         }
         return false;
     }

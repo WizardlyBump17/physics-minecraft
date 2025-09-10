@@ -41,9 +41,10 @@ public class RotatingCubeRenderer extends WorldShapeRenderer {
 
         for (double d = 0; d < 1; d += 0.05) {
             Vector3D rotation = cube.getRotation();
-            drawPoint(viewer, cube.getPosition().add(new Vector3D(d, 0, 0).rotateAround(rotation)), Color.RED, 0.15F);
-            drawPoint(viewer, cube.getPosition().add(new Vector3D(0, d, 0).rotateAround(rotation)), Color.BLUE, 0.15F);
-            drawPoint(viewer, cube.getPosition().add(new Vector3D(0, 0, d).rotateAround(rotation)), Color.GREEN, 0.15F);
+            Vector3D position = cube.getTransformedPosition();
+            drawPoint(viewer, position.add(new Vector3D(d, 0, 0).rotateAround(rotation)), Color.RED, 0.15F);
+            drawPoint(viewer, position.add(new Vector3D(0, d, 0).rotateAround(rotation)), Color.BLUE, 0.15F);
+            drawPoint(viewer, position.add(new Vector3D(0, 0, d).rotateAround(rotation)), Color.GREEN, 0.15F);
         }
     }
 
