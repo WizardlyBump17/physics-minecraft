@@ -205,6 +205,66 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
                 player.sendMessage("Rotation of the group #" + id + " set to " + rotation);
                 return false;
             }
+
+            case "pivot" -> {
+                if (args.length < 3) {
+                    player.sendMessage(Component.text("Usage: /physics pivot <id> <pivot>"));
+                    return false;
+                }
+
+                int id;
+                try {
+                    id = Integer.parseInt(args[1]);
+                } catch (NumberFormatException e) {
+                    player.sendMessage(Component.text("Invalid id."));
+                    return false;
+                }
+
+                ShapesGroup group = container.getGroup(id);
+                if (group == null) {
+                    player.sendMessage(Component.text("Group not found."));
+                    return false;
+                }
+
+                String pivotString = args[2];
+                Vector3D pivot;
+
+                switch (pivotString) {
+                    case "clear" -> {
+                        pivot = group.getShapes().stream().findFirst()
+                                .map(Shape::getPosition)
+                                .orElse(group.getCenter());
+                    }
+                    case "current" -> pivot = Converter.convert(player.getLocation().toVector());
+                    default -> {
+                        String[] split = pivotString.split(",");
+                        if (split.length != 3) {
+                            player.sendMessage(Component.text("Invalid pivot format. Use 'x,y,z'."));
+                            return false;
+                        }
+
+                        try {
+                            pivot = new Vector3D(
+                                    Double.parseDouble(split[0]),
+                                    Double.parseDouble(split[1]),
+                                    Double.parseDouble(split[2])
+                            );
+                        } catch (NumberFormatException e) {
+                            player.sendMessage(Component.text("Invalid pivot values. Must be numbers."));
+                            return false;
+                        }
+                    }
+                }
+
+                group.getShapes().replaceAll(shape -> {
+                    if (shape instanceof RotatingCube cube)
+                        return cube.setPivot(pivot);
+                    return shape;
+                });
+
+                player.sendMessage("Pivot of the group #" + id + " set to " + pivot);
+                return false;
+            }
         }
         return false;
     }
