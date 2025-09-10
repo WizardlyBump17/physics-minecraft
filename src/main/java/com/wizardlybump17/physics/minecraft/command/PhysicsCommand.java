@@ -214,7 +214,7 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
         };
 
         shapeRendererTask.getRenderers(shape.getClass(), containerId).stream().findFirst().ifPresent(renderer -> {
-            DebugShapesGroup group = new DebugShapesGroup(List.of(shape, shape.at(shape.getPosition().add(3, 0, 0))), container, player, follow, false);
+            DebugShapesGroup group = new DebugShapesGroup(List.of(shape), container, player, follow, false);
             engine.getScheduler().schedule(() -> container.addGroup(group));
 
             renderer.addViewer(player);
