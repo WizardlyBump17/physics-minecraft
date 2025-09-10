@@ -46,6 +46,8 @@ public class RotatingCubeRenderer extends WorldShapeRenderer {
             drawPoint(viewer, position.add(new Vector3D(0, d, 0).rotateAround(rotation)), Color.BLUE, 0.15F);
             drawPoint(viewer, position.add(new Vector3D(0, 0, d).rotateAround(rotation)), Color.GREEN, 0.15F);
         }
+
+        drawPoint(viewer, cube.getPivot(), Color.PURPLE, 1);
     }
 
     @Override
