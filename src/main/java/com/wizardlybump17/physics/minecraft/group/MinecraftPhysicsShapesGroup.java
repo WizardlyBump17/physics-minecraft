@@ -22,8 +22,16 @@ public class MinecraftPhysicsShapesGroup extends ContainerShapesGroup {
                 container,
                 Map.of(Id.GENERIC, acceleration),
                 velocity,
-                shapes.stream().map(Shape::getPosition).reduce(Vector3D::add).orElseThrow(),
-                shapes.stream().map(Shape::getPosition).reduce(Vector3D::add).orElseThrow(),
+                shapes.stream()
+                        .map(Shape::getPosition)
+                        .reduce(Vector3D::add)
+                        .map(position -> position.divide(shapes.size()))
+                        .orElseThrow(),
+                shapes.stream()
+                        .map(Shape::getPosition)
+                        .reduce(Vector3D::add)
+                        .map(position -> position.divide(shapes.size()))
+                        .orElseThrow(),
                 rotation,
                 MapUtil.fromCollection(shapes, shape -> new Id("Shape", String.valueOf(shape.hashCode())))
         );
