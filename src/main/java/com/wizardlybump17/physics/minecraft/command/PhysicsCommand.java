@@ -3,14 +3,14 @@ package com.wizardlybump17.physics.minecraft.command;
 import com.wizardlybump17.physics.minecraft.Converter;
 import com.wizardlybump17.physics.minecraft.debug.DebugShapesGroupsContainer;
 import com.wizardlybump17.physics.minecraft.debug.group.DebugShapesGroup;
+import com.wizardlybump17.physics.minecraft.group.MinecraftPhysicsShapesGroup;
 import com.wizardlybump17.physics.minecraft.renderer.shape.CubeRenderer;
 import com.wizardlybump17.physics.minecraft.renderer.shape.RotatingCubeRenderer;
 import com.wizardlybump17.physics.minecraft.renderer.shape.SphereRenderer;
 import com.wizardlybump17.physics.minecraft.task.ShapeRendererTask;
 import com.wizardlybump17.physics.three.Engine;
 import com.wizardlybump17.physics.three.Vector3D;
-import com.wizardlybump17.physics.three.group.PhysicsShapesGroup;
-import com.wizardlybump17.physics.three.group.ShapesGroup;
+import com.wizardlybump17.physics.three.group.ContainerShapesGroup;
 import com.wizardlybump17.physics.three.registry.ShapesGroupsContainerRegistry;
 import com.wizardlybump17.physics.three.shape.Cube;
 import com.wizardlybump17.physics.three.shape.Shape;
@@ -70,8 +70,8 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
 
                 switch (args[1].toLowerCase()) {
                     case "clear" -> {
-                        List<ShapesGroup> groups = List.copyOf(container.getShapesGroups());
-                        for (ShapesGroup group : groups)
+                        List<ContainerShapesGroup> groups = List.copyOf(container.getGroups());
+                        for (ContainerShapesGroup group : groups)
                             container.removeGroup(group);
                     }
                     case "follow" -> {
@@ -86,7 +86,7 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
                             case "toggle" -> {
                                 if (args.length == 4) {
                                     try {
-                                        ShapesGroup group = container.getGroup(Integer.parseInt(args[3]));
+                                        ContainerShapesGroup group = container.getGroup(Integer.parseInt(args[3]));
                                         if (group instanceof DebugShapesGroup debugGroup)
                                             debugGroup.setFollowing(!debugGroup.isFollowing());
                                         player.sendMessage(Component.text("Following: " + (group instanceof DebugShapesGroup debugGroup && debugGroup.isFollowing())));
@@ -96,7 +96,7 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
                                     return false;
                                 }
 
-                                for (ShapesGroup group : container.getShapesGroups()) {
+                                for (ContainerShapesGroup group : container.getGroups()) {
                                     if (group instanceof DebugShapesGroup debugGroup)
                                         debugGroup.setFollowing(!debugGroup.isFollowing());
                                 }
@@ -108,7 +108,7 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
                         spawnDebugObjects(player, container, false, type);
                     }
                     case "physics" -> {
-                        container.addGroup(new PhysicsShapesGroup(
+                        container.addGroup(new MinecraftPhysicsShapesGroup(
                                 container,
                                 List.of(new Sphere(Converter.convert(player.getEyeLocation().toVector()), 1)),
                                 new Vector3D(0, -9.8, 0).divide(engine.getTicksPerSecond()),
@@ -116,15 +116,9 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
                                 Vector3D.ZERO
                         ) {
                             @Override
-                            public boolean isPassable() {
-                                return false;
-                            }
-
-                            @Override
                             public void tick() {
                                 super.tick();
-
-                                System.out.println(getCenter());
+                                System.out.println(getPosition());
                             }
                         });
                         shapeRendererTask.getRenderers(Sphere.class, container.getId()).stream().findFirst().ifPresent(renderer -> {
@@ -140,7 +134,7 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
                             case "toggle" -> {
                                 if (args.length == 4) {
                                     try {
-                                        ShapesGroup group = container.getGroup(Integer.parseInt(args[3]));
+                                        ContainerShapesGroup group = container.getGroup(Integer.parseInt(args[3]));
                                         if (group instanceof DebugShapesGroup debugGroup)
                                             debugGroup.setCheckMaxMovement(!debugGroup.isCheckMaxMovement());
                                         player.sendMessage(Component.text("Checking max movement: " + (group instanceof DebugShapesGroup debugGroup && debugGroup.isCheckMaxMovement())));
@@ -150,7 +144,7 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
                                     return false;
                                 }
 
-                                for (ShapesGroup group : container.getShapesGroups()) {
+                                for (ContainerShapesGroup group : container.getGroups()) {
                                     if (group instanceof DebugShapesGroup debugGroup)
                                         debugGroup.setFollowing(!debugGroup.isCheckMaxMovement());
                                 }
@@ -174,7 +168,7 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
                     return false;
                 }
 
-                ShapesGroup group = container.getGroup(id);
+                ContainerShapesGroup group = container.getGroup(id);
                 if (group == null) {
                     player.sendMessage(Component.text("Group not found."));
                     return false;
@@ -199,8 +193,7 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
                     return false;
                 }
 
-                if (group instanceof PhysicsShapesGroup physicsShapesGroup)
-                    physicsShapesGroup.setRotation(rotation);
+                group.setRotation(rotation);
 
                 player.sendMessage("Rotation of the group #" + id + " set to " + rotation);
                 return false;
@@ -220,7 +213,7 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
                     return false;
                 }
 
-                ShapesGroup group = container.getGroup(id);
+                ContainerShapesGroup group = container.getGroup(id);
                 if (group == null) {
                     player.sendMessage(Component.text("Group not found."));
                     return false;
@@ -231,9 +224,9 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
 
                 switch (pivotString) {
                     case "clear" -> {
-                        pivot = group.getShapes().stream().findFirst()
+                        pivot = group.getShapes().values().stream().findFirst()
                                 .map(Shape::getPosition)
-                                .orElse(group.getCenter());
+                                .orElse(group.getPosition());
                     }
                     case "current" -> pivot = Converter.convert(player.getLocation().toVector());
                     default -> {
@@ -256,11 +249,7 @@ public class PhysicsCommand implements CommandExecutor, TabCompleter {
                     }
                 }
 
-                group.getShapes().replaceAll(shape -> {
-                    if (shape instanceof RotatingCube cube)
-                        return cube.setPivot(pivot);
-                    return shape;
-                });
+                group.setPivot(pivot);
 
                 player.sendMessage("Pivot of the group #" + id + " set to " + pivot);
                 return false;

@@ -6,7 +6,6 @@ import com.wizardlybump17.physics.minecraft.group.MinecraftPhysicsShapesGroup;
 import com.wizardlybump17.physics.three.Vector3D;
 import com.wizardlybump17.physics.three.shape.Cube;
 import com.wizardlybump17.physics.three.shape.Shape;
-import com.wizardlybump17.physics.three.shape.rotating.RotatingCube;
 import io.papermc.paper.util.CollisionUtil;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
@@ -49,14 +48,14 @@ public class DebugShapesGroup extends MinecraftPhysicsShapesGroup {
             return;
 
         Vector3D targetPosition = Converter.convert(playerEyeLocation.add(playerEyeLocation.getDirection().multiply(3)).toVector());
-        Vector3D currentPosition = getCenter();
+        Vector3D currentPosition = getPosition();
 
         if (checkMaxMovement) {
             setVelocity(targetPosition.subtract(currentPosition));
             super.tick();
         } else {
             setVelocity(Vector3D.ZERO);
-            setCenter(targetPosition);
+            setPosition(targetPosition);
         }
     }
 
@@ -93,11 +92,11 @@ public class DebugShapesGroup extends MinecraftPhysicsShapesGroup {
         if (movement.lengthSquared() == 0)
             return movement;
 
-        Vector3D center = getCenter();
+        Vector3D center = getPosition();
         Vector3D closest = null;
         double closestDistance = Double.MAX_VALUE;
 
-        for (Shape shape : getShapes()) {
+        for (Shape shape : getTransformedShapes().values()) {
             if (!(shape instanceof Cube cube))
                 continue;
 
@@ -203,16 +202,5 @@ public class DebugShapesGroup extends MinecraftPhysicsShapesGroup {
             return limitedMoveVector;
         }
         // Paper end - optimise collisions
-    }
-
-    @Override
-    public void setRotation(@NotNull Vector3D rotation) {
-        super.setRotation(rotation);
-        getShapes().replaceAll(shape -> {
-            if (shape instanceof RotatingCube rotatable) {
-                shape = rotatable.setRotation(rotation);
-            }
-            return shape;
-        });
     }
 }
